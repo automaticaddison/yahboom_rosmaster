@@ -19,6 +19,9 @@
         <geometry>
             <mesh filename="file://$(find yahboom_rosmaster_description)/meshes/rosmaster_x3/visual/base_link_X3.STL"/>
         </geometry>
+        <material name="green">
+          <color rgba="0 0.7 0 1"/>
+        </material>
         <origin xyz="0 0 0" rpy="0 0 0"/>
     </visual>
     <collision>
