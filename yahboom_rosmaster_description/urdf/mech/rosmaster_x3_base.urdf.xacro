@@ -4,9 +4,9 @@
 <xacro:property name="wheel_width" value="0.0304" />
 <xacro:property name="wheel_radius" value="0.0325" />
 <xacro:property name="total_height" value="0.26225" />
-<xacro:property name="base_length" value="0.300" />  <!-- 300mm -->
-<xacro:property name="centered_length" value="0.238" />  <!-- 238mm -->
-<xacro:property name="base_x_offset" value="${(centered_length - base_length) / 2}" />  <!-- (238-300)/2 mm in meters -->
+<xacro:property name="base_length" value="0.300" />
+<xacro:property name="centered_length" value="0.238" />
+<xacro:property name="base_x_offset" value="${(centered_length - base_length) / 2}" />
 <xacro:property name="base_size_x" value="${base_length}" />
 <xacro:property name="base_size_y" value="${total_width - (2 * wheel_width)}" />
 <xacro:property name="base_size_z" value="${total_height - (2 * wheel_radius)}" />
