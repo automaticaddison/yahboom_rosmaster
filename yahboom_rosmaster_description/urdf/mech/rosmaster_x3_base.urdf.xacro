@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+<xacro:property name="total_width" value="0.19940" />
+<xacro:property name="wheel_width" value="0.0304" />
+<xacro:property name="wheel_radius" value="0.0325" />
+<xacro:property name="total_height" value="0.26225" />
+<xacro:property name="base_length" value="0.300" />  <!-- 300mm -->
+<xacro:property name="centered_length" value="0.238" />  <!-- 238mm -->
+<xacro:property name="base_x_offset" value="${(centered_length - base_length) / 2}" />  <!-- (238-300)/2 mm in meters -->
+<xacro:property name="base_size_x" value="${base_length}" />
+<xacro:property name="base_size_y" value="${total_width - (2 * wheel_width)}" />
+<xacro:property name="base_size_z" value="${total_height - (2 * wheel_radius)}" />
+<xacro:property name="base_mass" value="4.6" />
+
+<xacro:macro name="rosmaster_x3_base" params="prefix">
+  <link name="${prefix}base_footprint"/>
+  <link name="${prefix}base_link">
+    <visual>
+        <geometry>
+            <mesh filename="file://$(find yahboom_rosmaster_description)/meshes/rosmaster_x3/visual/base_link_X3.STL"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </visual>
+    <collision>
+        <geometry>
+            <box size="${base_size_x} ${base_size_y} ${base_size_z}"/>
+        </geometry>
+        <origin xyz="${base_x_offset} 0 ${base_size_z/2}" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+        <origin xyz="${base_x_offset} 0 ${base_size_z/2}" rpy="0 0 0"/>
+        <mass value="${base_mass}"/>
+        <inertia
+            ixx="${(1/12) * base_mass * ((base_size_y * base_size_y) + (base_size_z * base_size_z))}" ixy="0.0" ixz="0.0"
+            iyy="${(1/12) * base_mass * ((base_size_x * base_size_x) + (base_size_z * base_size_z))}" iyz="0.0"
+            izz="${(1/12) * base_mass * ((base_size_x * base_size_x) + (base_size_y * base_size_y))}"/>
+    </inertial>
+  </link>
+  <gazebo reference="${prefix}base_link">
+    <visual>
+        <material>
+            <ambient>0 0.7 0 1</ambient>
+            <diffuse>0 0.7 0 1</diffuse>
+            <specular>0 0.7 0 1</specular>
+        </material>
+    </visual>
+  </gazebo>
+  <joint name="${prefix}base_joint" type="fixed">
+    <parent link="${prefix}base_footprint"/>
+    <child link="${prefix}base_link"/>
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+  </joint>
+</xacro:macro>
+</robot>
