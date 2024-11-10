@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:macro name="rgbd_camera" params="
+    prefix:=''
+    camera_name:='cam_1'
+    parent:='base_link'
+    mesh_file:='file://$(find yahboom_rosmaster_description)/meshes/intel_realsense/visual/d435.stl'
+    xyz_offset:='0 0.01 0.50'
+    rpy_offset:='0.0 ${45 * M_PI/180} ${M_PI/2}'
+    mesh_xyz_offset:='0 0 0'
+    mesh_rpy_offset:='${M_PI/2} 0.0 ${M_PI/2}'
+    collision_xyz_offset:='0 0 0'
+    collision_rpy_offset:='0 0 0'
+    inertial_xyz_offset:='0 0 0'
+    inertial_rpy_offset:='0 0 0'
+    optical_xyz_offset:='0 0 0'
+    optical_rpy_offset:='${-M_PI/2} 0 ${-M_PI/2}'
+    depth_frame_xyz_offset:='0 0 0'
+    depth_frame_rpy_offset:='0 0 0'
+    infra1_xyz_offset:='0 0 0'
+    infra1_rpy_offset:='0 0 0'
+    infra2_xyz_offset:='0 -0.05 0'
+    infra2_rpy_offset:='0 0 0'
+    color_xyz_offset:='0 0.015 0'
+    color_rpy_offset:='0 0 0'
+    cam_width:=0.090
+    cam_height:=0.025
+    cam_depth:=0.02505
+    mass:=0.072
+    ixx:=0.003881243
+    ixy:=0.0
+    ixz:=0.0
+    iyy:=0.000498940
+    iyz:=0.0
+    izz:=0.003879257
+    material_name:='aluminum'
+    material_color:='0.5 0.5 0.5 1'
+    horizontal_fov:=1.5184
+    image_width:=424
+    image_height:=240
+    clip_near:=0.05
+    clip_far:=1.5
+    update_rate:=5
+    always_on:=1
+    visualize:=true">
+
+    <link name="${prefix}${camera_name}_link">
+      <visual>
+        <origin xyz="${mesh_xyz_offset}" rpy="${mesh_rpy_offset}"/>
+        <geometry>
+          <mesh filename="${mesh_file}" />
+        </geometry>
+        <material name="${material_name}">
+          <color rgba="${material_color}"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="${collision_xyz_offset}" rpy="${collision_rpy_offset}"/>
+        <geometry>
+          <box size="${cam_depth} ${cam_width} ${cam_height}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="${inertial_xyz_offset}" rpy="${inertial_rpy_offset}"/>
+        <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}"
+                 iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
+      </inertial>
+    </link>
+
+    <joint name="${prefix}${camera_name}_joint" type="fixed">
+      <parent link="${prefix}${parent}"/>
+      <child link="${prefix}${camera_name}_link" />
+      <origin xyz="${xyz_offset}" rpy="${rpy_offset}"/>
+    </joint>
+
+    <joint name="${prefix}${camera_name}_depth_joint" type="fixed">
+      <origin xyz="${depth_frame_xyz_offset}" rpy="${depth_frame_rpy_offset}"/>
+      <parent link="${prefix}${camera_name}_link"/>
+      <child link="${prefix}${camera_name}_depth_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_depth_frame"/>
+
+    <joint name="${prefix}${camera_name}_depth_optical_joint" type="fixed">
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_depth_frame" />
+      <child link="${prefix}${camera_name}_depth_optical_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_depth_optical_frame"/>
+
+    <joint name="${prefix}${camera_name}_infra1_joint" type="fixed">
+      <origin xyz="${infra1_xyz_offset}" rpy="${infra1_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_link" />
+      <child link="${prefix}${camera_name}_infra1_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_infra1_frame"/>
+
+    <joint name="${prefix}${camera_name}_infra1_optical_joint" type="fixed">
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_infra1_frame" />
+      <child link="${prefix}${camera_name}_infra1_optical_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_infra1_optical_frame"/>
+
+    <joint name="${prefix}${camera_name}_infra2_joint" type="fixed">
+      <origin xyz="${infra2_xyz_offset}" rpy="${infra2_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_link" />
+      <child link="${prefix}${camera_name}_infra2_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_infra2_frame"/>
+
+    <joint name="${prefix}${camera_name}_infra2_optical_joint" type="fixed">
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_infra2_frame" />
+      <child link="${prefix}${camera_name}_infra2_optical_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_infra2_optical_frame"/>
+
+    <joint name="${prefix}${camera_name}_color_joint" type="fixed">
+      <origin xyz="${color_xyz_offset}" rpy="${color_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_link" />
+      <child link="${prefix}${camera_name}_color_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_color_frame"/>
+
+    <joint name="${prefix}${camera_name}_color_optical_joint" type="fixed">
+      <origin xyz="${optical_xyz_offset}" rpy="${optical_rpy_offset}" />
+      <parent link="${prefix}${camera_name}_color_frame" />
+      <child link="${prefix}${camera_name}_color_optical_frame" />
+    </joint>
+    <link name="${prefix}${camera_name}_color_optical_frame"/>
+
+    <gazebo reference="${prefix}${camera_name}_link">
+      <sensor name="${prefix}${camera_name}" type="rgbd_camera">
+        <camera>
+          <horizontal_fov>${horizontal_fov}</horizontal_fov>
+          <image>
+            <width>${image_width}</width>
+            <height>${image_height}</height>
+          </image>
+          <clip>
+            <near>${clip_near}</near>
+            <far>${clip_far}</far>
+          </clip>
+          <optical_frame_id>${prefix}${camera_name}_depth_optical_frame</optical_frame_id>
+        </camera>
+        <always_on>${always_on}</always_on>
+        <gz_frame_id>${prefix}${camera_name}_link</gz_frame_id>
+        <topic>${prefix}${camera_name}</topic>
+        <update_rate>${update_rate}</update_rate>
+        <visualize>${visualize}</visualize>
+      </sensor>
+    </gazebo>
+
+  </xacro:macro>
+</robot>

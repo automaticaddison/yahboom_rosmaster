@@ -4,6 +4,7 @@
 
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/rosmaster_x3_base.urdf.xacro"/>
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/mecanum_wheel.urdf.xacro"/>
+    <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/sensors/rgbd_camera.urdf.xacro"/>
 
     <xacro:rosmaster_x3_base prefix="$(arg prefix)"/>
 
@@ -31,7 +32,10 @@
       x_reflect="-1"
       y_reflect="-1"/>
 
-
-
+    <xacro:rgbd_camera
+      prefix="$(arg prefix)"
+      camera_name="cam_1"
+      xyz_offset="0.0 0 0.1"
+      rpy_offset="0 0.2 0"/>
 
 </robot>
