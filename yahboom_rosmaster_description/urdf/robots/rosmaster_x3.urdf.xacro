@@ -3,6 +3,31 @@
     <xacro:arg name="prefix" default=""/>
 
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/rosmaster_x3_base.urdf.xacro"/>
+    <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/mecanum_wheel.urdf.xacro"/>
 
     <xacro:rosmaster_x3_base prefix="$(arg prefix)"/>
+
+    <xacro:mecanum_wheel
+        prefix="$(arg prefix)"
+        side="front_right"
+        x_reflect="-1"
+        y_reflect="1"/>
+
+    <xacro:mecanum_wheel
+        prefix="$(arg prefix)"
+        side="front_left"
+        x_reflect="-1"
+        y_reflect="-1"/>
+
+    <xacro:mecanum_wheel
+        prefix="$(arg prefix)"
+        side="back_left"
+        x_reflect="1"
+        y_reflect="-1"/>
+
+    <xacro:mecanum_wheel
+        prefix="$(arg prefix)"
+        side="back_right"
+        x_reflect="1"
+        y_reflect="1"/>
 </robot>
