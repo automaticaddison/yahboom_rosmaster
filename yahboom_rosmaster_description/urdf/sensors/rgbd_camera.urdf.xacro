@@ -8,8 +8,8 @@
     camera_name:='cam_1'
     parent:='base_link'
     mesh_file:='file://$(find yahboom_rosmaster_description)/meshes/intel_realsense/visual/d435.stl'
-    xyz_offset:='0 0.01 0.50'
-    rpy_offset:='0.0 ${45 * M_PI/180} ${M_PI/2}'
+    xyz_offset:='0.09 0 0.05'
+    rpy_offset:='0 -0.55 0'
     mesh_xyz_offset:='0 0 0'
     mesh_rpy_offset:='${M_PI/2} 0.0 ${M_PI/2}'
     collision_xyz_offset:='0 0 0'
@@ -45,7 +45,8 @@
     clip_far:=1.5
     update_rate:=5
     always_on:=1
-    visualize:=true">
+    visualize:=true
+    enable_collision:=false">
 
     <link name="${prefix}${camera_name}_link">
       <visual>
@@ -57,12 +58,14 @@
           <color rgba="${material_color}"/>
         </material>
       </visual>
-      <collision>
-        <origin xyz="${collision_xyz_offset}" rpy="${collision_rpy_offset}"/>
-        <geometry>
-          <box size="${cam_depth} ${cam_width} ${cam_height}"/>
-        </geometry>
-      </collision>
+      <xacro:if value="${enable_collision}">
+        <collision>
+          <origin xyz="${collision_xyz_offset}" rpy="${collision_rpy_offset}"/>
+          <geometry>
+            <box size="${cam_depth} ${cam_width} ${cam_height}"/>
+          </geometry>
+        </collision>
+      </xacro:if>
       <inertial>
         <mass value="${mass}" />
         <origin xyz="${inertial_xyz_offset}" rpy="${inertial_rpy_offset}"/>
