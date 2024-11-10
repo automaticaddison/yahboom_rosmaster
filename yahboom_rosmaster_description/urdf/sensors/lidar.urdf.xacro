@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:property name="M_PI" value="3.1415926535897931" />
+
+  <xacro:macro name="lidar_sensor" params="
+    prefix:=''
+    parent:='base_link'
+    frame_id:='laser_frame'
+    mesh_file:='file://$(find yahboom_rosmaster_description)/meshes/rplidar/rplidar_s2.stl'
+    xyz_offset:='0 0 0.0825'
+    rpy_offset:='0 0 0'
+    mesh_xyz_offset:='0 0 0'
+    mesh_rpy_offset:='${-M_PI/2} 0 0'
+    mesh_scale:='0.001 0.001 0.001'
+    collision_xyz_offset:='0 0 0'
+    collision_rpy_offset:='0 0 0'
+    inertial_xyz_offset:='0 0 0'
+    inertial_rpy_offset:='0 0 0'
+    lidar_width:=0.077
+    lidar_height:=0.0398
+    mass:=0.185
+    material_name:='rplidar_black'
+    material_color:='0.1 0.1 0.1 1'
+    gazebo_material_ambient:='0.1 0.1 0.1 1'
+    gazebo_material_diffuse:='0.1 0.1 0.1 1'
+    gazebo_material_specular:='0.1 0.1 0.1 1'
+    update_rate:=10
+    ray_count:=360
+    min_angle:='-3.14159'
+    max_angle:='3.14159'
+    min_range:='0.05'
+    max_range:='30.0'
+    range_resolution:='0.013'
+    topic_name:='scan'
+    always_on:=true
+    visualize:=false
+    enable_collision:=false">
+
+    <xacro:property name="radius" value="${lidar_width/2}" />
+    <xacro:property name="ixx_iyy" value="${(mass/12) * (3 * radius * radius + lidar_height * lidar_height)}" />
+    <xacro:property name="izz" value="${(mass/2) * (radius * radius)}" />
+
+    <link name="${prefix}${frame_id}">
+      <visual>
+        <origin xyz="${mesh_xyz_offset}" rpy="${mesh_rpy_offset}"/>
+        <geometry>
+          <mesh filename="${mesh_file}" scale="${mesh_scale}"/>
+        </geometry>
+        <material name="${material_name}">
+          <color rgba="${material_color}"/>
+        </material>
+      </visual>
+
+      <xacro:if value="${enable_collision}">
+        <collision>
+          <origin xyz="${collision_xyz_offset}" rpy="${collision_rpy_offset}"/>
+          <geometry>
+            <cylinder radius="${lidar_width/2}" length="${lidar_height}"/>
+          </geometry>
+        </collision>
+      </xacro:if>
+
+      <inertial>
+        <mass value="${mass}" />
+        <origin xyz="${inertial_xyz_offset}" rpy="${inertial_rpy_offset}"/>
+        <inertia
+          ixx="${ixx_iyy}"
+          ixy="0.0"
+          ixz="0.0"
+          iyy="${ixx_iyy}"
+          iyz="0.0"
+          izz="${izz}" />
+      </inertial>
+    </link>
+
+    <joint name="${prefix}${frame_id}_joint" type="fixed">
+      <parent link="${prefix}${parent}"/>
+      <child link="${prefix}${frame_id}" />
+      <origin xyz="${xyz_offset}" rpy="${rpy_offset}"/>
+    </joint>
+
+    <gazebo reference="${prefix}${frame_id}">
+      <material>
+        <ambient>${gazebo_material_ambient}</ambient>
+        <diffuse>${gazebo_material_diffuse}</diffuse>
+        <specular>${gazebo_material_specular}</specular>
+      </material>
+      <sensor name="${prefix}lidar_sensor" type="gpu_lidar">
+        <topic>${prefix}${topic_name}</topic>
+        <update_rate>${update_rate}</update_rate>
+        <always_on>${always_on}</always_on>
+        <visualize>${visualize}</visualize>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>${ray_count}</samples>
+              <resolution>1</resolution>
+              <min_angle>${min_angle}</min_angle>
+              <max_angle>${max_angle}</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>${min_range}</min>
+            <max>${max_range}</max>
+            <resolution>${range_resolution}</resolution>
+          </range>
+        </ray>
+        <gz_frame_id>${prefix}${frame_id}</gz_frame_id>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+</robot>

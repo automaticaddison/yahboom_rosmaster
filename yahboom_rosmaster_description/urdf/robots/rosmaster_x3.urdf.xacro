@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="rosmaster_x3">
+
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
     <xacro:arg name="prefix" default=""/>
 
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/rosmaster_x3_base.urdf.xacro"/>
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/mecanum_wheel.urdf.xacro"/>
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/sensors/rgbd_camera.urdf.xacro"/>
+    <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/sensors/lidar.urdf.xacro"/>
 
     <xacro:rosmaster_x3_base prefix="$(arg prefix)"/>
 
@@ -35,7 +39,16 @@
     <xacro:rgbd_camera
       prefix="$(arg prefix)"
       camera_name="cam_1"
-      xyz_offset="0.09 0 0.05"
-      rpy_offset="0 -0.55 0"/>
+      xyz_offset="0.105 0 0.05"
+      rpy_offset="0 -0.50 0"/>
+
+    <xacro:lidar_sensor
+      prefix="$(arg prefix)"
+      parent="base_link"
+      frame_id="laser_frame"
+      xyz_offset="0 0 0.0825"
+      rpy_offset="0 0 0"
+      mesh_xyz_offset="0 0 0"
+      mesh_rpy_offset="${-M_PI/2} 0 0"/>
 
 </robot>
