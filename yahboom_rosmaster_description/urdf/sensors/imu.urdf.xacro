@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <xacro:macro name="imu_sensor" params="
+        prefix:=''
+        parent:='base_link'
+        frame_id:='imu'
+        xyz_offset:='0 0 0'
+        rpy_offset:='0 0 0'
+        inertial_xyz_offset:='0 0 0'
+        inertial_rpy_offset:='0 0 0'
+        mass:='0.031'
+        length:='0.03899'
+        width:='0.03785'
+        height:='0.01338'
+        material_name:='imu_black'
+        material_color:='0.1 0.1 0.1 1'
+        gazebo_material_ambient:='0.1 0.1 0.1 1'
+        gazebo_material_diffuse:='0.1 0.1 0.1 1'
+        gazebo_material_specular:='0.1 0.1 0.1 1'
+        update_rate:='15.0'
+        topic_name:='imu/data'
+        always_on:=true
+        visualize:=false">
+
+        <xacro:property name="ixx" value="${(mass/12) * (height*height + width*width)}" />
+        <xacro:property name="iyy" value="${(mass/12) * (length*length + height*height)}" />
+        <xacro:property name="izz" value="${(mass/12) * (length*length + width*width)}" />
+
+        <link name="${prefix}${frame_id}_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="${length} ${width} ${height}"/>
+                </geometry>
+                <material name="${material_name}">
+                    <color rgba="${material_color}"/>
+                </material>
+            </visual>
+
+            <inertial>
+                <mass value="${mass}" />
+                <origin xyz="${inertial_xyz_offset}" rpy="${inertial_rpy_offset}"/>
+                <inertia
+                    ixx="${ixx}"
+                    ixy="0.0"
+                    ixz="0.0"
+                    iyy="${iyy}"
+                    iyz="0.0"
+                    izz="${izz}" />
+            </inertial>
+        </link>
+
+        <joint name="${prefix}${frame_id}_joint" type="fixed">
+            <parent link="${prefix}${parent}"/>
+            <child link="${prefix}${frame_id}_link" />
+            <origin xyz="${xyz_offset}" rpy="${rpy_offset}"/>
+        </joint>
+
+        <gazebo reference="${prefix}${frame_id}_link">
+            <material>
+                <ambient>${gazebo_material_ambient}</ambient>
+                <diffuse>${gazebo_material_diffuse}</diffuse>
+                <specular>${gazebo_material_specular}</specular>
+            </material>
+            <sensor name="${prefix}imu_sensor" type="imu">
+                <topic>${prefix}${topic_name}</topic>
+                <update_rate>${update_rate}</update_rate>
+                <always_on>${always_on}</always_on>
+                <visualize>${visualize}</visualize>
+                <gz_frame_id>${prefix}${frame_id}_link</gz_frame_id>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>
