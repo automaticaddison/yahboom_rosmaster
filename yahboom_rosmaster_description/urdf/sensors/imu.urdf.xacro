@@ -10,10 +10,10 @@
         rpy_offset:='0 0 0'
         inertial_xyz_offset:='0 0 0'
         inertial_rpy_offset:='0 0 0'
-        mass:='0.031'
-        length:='0.03899'
-        width:='0.03785'
-        height:='0.01338'
+        mass:=0.031
+        length:=0.03899
+        width:=0.03785
+        height:=0.01338
         material_name:='imu_black'
         material_color:='0.1 0.1 0.1 1'
         gazebo_material_ambient:='0.1 0.1 0.1 1'
@@ -24,9 +24,9 @@
         always_on:=true
         visualize:=false">
 
-        <xacro:property name="ixx" value="${(mass/12) * (height*height + width*width)}" />
-        <xacro:property name="iyy" value="${(mass/12) * (length*length + height*height)}" />
-        <xacro:property name="izz" value="${(mass/12) * (length*length + width*width)}" />
+        <xacro:property name="ixx" value="${(mass/12.0) * (height*height + width*width)}" />
+        <xacro:property name="iyy" value="${(mass/12.0) * (length*length + height*height)}" />
+        <xacro:property name="izz" value="${(mass/12.0) * (length*length + width*width)}" />
 
         <link name="${prefix}${frame_id}_link">
             <visual>
