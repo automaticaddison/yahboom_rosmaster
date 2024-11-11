@@ -4,6 +4,7 @@
     <xacro:property name="M_PI" value="3.1415926535897931" />
 
     <xacro:arg name="prefix" default=""/>
+    <xacro:arg name="use_gazebo" default="false"/>
 
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/rosmaster_x3_base.urdf.xacro"/>
     <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/mech/mecanum_wheel.urdf.xacro"/>
