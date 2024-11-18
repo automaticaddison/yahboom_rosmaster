@@ -1,1 +1,287 @@
-# Placeholder
+mecanum_drive_controller:
+  front_left_joint_name: {
+    type: string,
+    default_value: "front_left_wheel_joint",
+    description: "Name of the joint that controls the front left wheel",
+    validation: {
+      not_empty<>: []
+    }
+  }
+  front_right_joint_name: {
+    type: string,
+    default_value: "front_right_wheel_joint",
+    description: "Name of the joint that controls the front right wheel",
+    validation: {
+      not_empty<>: []
+    }
+  }
+  back_left_joint_name: {
+    type: string,
+    default_value: "back_left_wheel_joint",
+    description: "Name of the joint that controls the back left wheel",
+    validation: {
+      not_empty<>: []
+    }
+  }
+  back_right_joint_name: {
+    type: string,
+    default_value: "back_right_wheel_joint",
+    description: "Name of the joint that controls the back right wheel",
+    validation: {
+      not_empty<>: []
+    }
+  }
+  wheel_base: {
+    type: double,
+    default_value: 0.16,
+    description: "Longitudinal distance between front and back wheels in meters. If this parameter is wrong, the robot will not move correctly.",
+    validation: {
+      gt<>: [0.0]
+    }
+  }
+  wheel_separation: {
+    type: double,
+    default_value: 0.169,
+    description: "Lateral distance between left and right wheels in meters. If this parameter is wrong, the robot will not behave correctly in movements.",
+    validation: {
+      gt<>: [0.0]
+    }
+  }
+  wheel_radius: {
+    type: double,
+    default_value: 0.0325,
+    description: "Radius of the wheels in meters. If this parameter is wrong the robot will move faster or slower than expected.",
+    validation: {
+      gt<>: [0.0]
+    }
+  }
+  wheel_separation_multiplier: {
+    type: double,
+    default_value: 1.0,
+    description: "Correction factor for wheel separation",
+  }
+  front_left_wheel_radius_multiplier: {
+    type: double,
+    default_value: 1.0,
+    description: "Correction factor when radius of front left wheel differs from the nominal value in wheel_radius parameter",
+  }
+  front_right_wheel_radius_multiplier: {
+    type: double,
+    default_value: 1.0,
+    description: "Correction factor when radius of front right wheel differs from the nominal value in wheel_radius parameter",
+  }
+  back_left_wheel_radius_multiplier: {
+    type: double,
+    default_value: 1.0,
+    description: "Correction factor when radius of back left wheel differs from the nominal value in wheel_radius parameter",
+  }
+  back_right_wheel_radius_multiplier: {
+    type: double,
+    default_value: 1.0,
+    description: "Correction factor when radius of back right wheel differs from the nominal value in wheel_radius parameter",
+  }
+  tf_frame_prefix_enable: {
+    type: bool,
+    default_value: false,
+    description: "Enables or disables appending tf_prefix to tf frame ids",
+  }
+  tf_frame_prefix: {
+    type: string,
+    default_value: "",
+    description: "Prefix to be appended to the tf frames, will be added to odom_id and base_frame_id before publishing. If the parameter is empty, controller's namespace will be used",
+  }
+  odom_frame_id: {
+    type: string,
+    default_value: "odom",
+    description: "Name of the frame for odometry. This frame is parent of base_frame_id when controller publishes odometry",
+  }
+  base_frame_id: {
+    type: string,
+    default_value: "base_link",
+    description: "Name of the robot's base frame that is child of the odometry frame",
+  }
+  pose_covariance_diagonal: {
+    type: double_array,
+    default_value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    description: "Odometry covariance for the encoder output of the robot for the pose",
+  }
+  twist_covariance_diagonal: {
+    type: double_array,
+    default_value: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    description: "Odometry covariance for the encoder output of the robot for the speed",
+  }
+  position_feedback: {
+    type: bool,
+    default_value: true,
+    description: "Is there position feedback from hardware",
+  }
+  open_loop: {
+    type: bool,
+    default_value: false,
+    description: "If set to true the odometry of the robot will be calculated from the commanded values and not from feedback",
+  }
+  enable_odom_tf: {
+    type: bool,
+    default_value: true,
+    description: "Publish transformation between odom_frame_id and base_frame_id",
+  }
+  cmd_vel_timeout: {
+    type: double,
+    default_value: 0.5,
+    description: "Timeout in seconds, after which input command on cmd_vel topic is considered outdated",
+  }
+  publish_limited_velocity: {
+    type: bool,
+    default_value: false,
+    description: "Publish limited velocity value",
+  }
+  velocity_rolling_window_size: {
+    type: int,
+    default_value: 10,
+    description: "Number of velocity samples the system will use to calculate the mean velocity for odometry updates",
+  }
+  publish_rate: {
+    type: double,
+    default_value: 50.0,
+    description: "Publishing rate (Hz) of the odometry and TF messages",
+  }
+  linear:
+    x:
+      has_velocity_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable velocity limits for X direction",
+      }
+      has_acceleration_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable acceleration limits for X direction",
+      }
+      has_jerk_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable jerk limits for X direction",
+      }
+      max_velocity: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum velocity in X direction",
+      }
+      min_velocity: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum velocity in X direction",
+      }
+      max_acceleration: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum acceleration in X direction",
+      }
+      min_acceleration: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum acceleration in X direction",
+      }
+      max_jerk: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum jerk in X direction",
+      }
+      min_jerk: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum jerk in X direction",
+      }
+    y:
+      has_velocity_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable velocity limits for Y direction",
+      }
+      has_acceleration_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable acceleration limits for Y direction",
+      }
+      has_jerk_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable jerk limits for Y direction",
+      }
+      max_velocity: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum velocity in Y direction",
+      }
+      min_velocity: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum velocity in Y direction",
+      }
+      max_acceleration: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum acceleration in Y direction",
+      }
+      min_acceleration: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum acceleration in Y direction",
+      }
+      max_jerk: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum jerk in Y direction",
+      }
+      min_jerk: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum jerk in Y direction",
+      }
+  angular:
+    z:
+      has_velocity_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable angular velocity limits",
+      }
+      has_acceleration_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable angular acceleration limits",
+      }
+      has_jerk_limits: {
+        type: bool,
+        default_value: false,
+        description: "Enable/disable angular jerk limits",
+      }
+      max_velocity: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum angular velocity",
+      }
+      min_velocity: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum angular velocity",
+      }
+      max_acceleration: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum angular acceleration",
+      }
+      min_acceleration: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum angular acceleration",
+      }
+      max_jerk: {
+        type: double,
+        default_value: 0.0,
+        description: "Maximum angular jerk",
+      }
+      min_jerk: {
+        type: double,
+        default_value: 0.0,
+        description: "Minimum angular jerk",
+      }
