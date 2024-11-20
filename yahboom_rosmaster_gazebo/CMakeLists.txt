@@ -21,7 +21,7 @@ find_package(xacro REQUIRED)
 
 # Copy necessary files to designated locations in the project
 install (
-  DIRECTORY config
+  DIRECTORY config launch models worlds
   DESTINATION share/${PROJECT_NAME}
 )
 
