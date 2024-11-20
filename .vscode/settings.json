@@ -8,6 +8,7 @@
     "/opt/ros/jazzy/lib/python3.12/site-packages"
   ],
   "files.associations": {
-    "chrono": "cpp"
+    "chrono": "cpp",
+    "array": "cpp"
   }
 }

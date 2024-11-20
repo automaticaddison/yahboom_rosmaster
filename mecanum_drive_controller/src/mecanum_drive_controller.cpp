@@ -182,21 +182,39 @@ controller_interface::return_type MecanumDriveController::update(
   {
     if (params_.position_feedback)
     {
-      odometry_.update(
-        wheel_handles_[FRONT_LEFT].feedback.get().get_value(),
-        wheel_handles_[FRONT_RIGHT].feedback.get().get_value(),
-        wheel_handles_[BACK_LEFT].feedback.get().get_value(),
-        wheel_handles_[BACK_RIGHT].feedback.get().get_value(),
-        time);
+      if (wheel_handles_[FRONT_LEFT].feedback && wheel_handles_[FRONT_RIGHT].feedback &&
+        wheel_handles_[BACK_LEFT].feedback && wheel_handles_[BACK_RIGHT].feedback)
+      {
+        odometry_.update(
+          wheel_handles_[FRONT_LEFT].feedback->get().get_value(),
+          wheel_handles_[FRONT_RIGHT].feedback->get().get_value(),
+          wheel_handles_[BACK_LEFT].feedback->get().get_value(),
+          wheel_handles_[BACK_RIGHT].feedback->get().get_value(),
+          time);
+      }
+      else
+      {
+        RCLCPP_ERROR(logger, "Wheel feedback handles are not available");
+        return controller_interface::return_type::ERROR;
+      }
     }
     else
     {
-      odometry_.updateFromVelocity(
-        wheel_handles_[FRONT_LEFT].feedback.get().get_value(),
-        wheel_handles_[FRONT_RIGHT].feedback.get().get_value(),
-        wheel_handles_[BACK_LEFT].feedback.get().get_value(),
-        wheel_handles_[BACK_RIGHT].feedback.get().get_value(),
-        time);
+      if (wheel_handles_[FRONT_LEFT].feedback && wheel_handles_[FRONT_RIGHT].feedback &&
+          wheel_handles_[BACK_LEFT].feedback && wheel_handles_[BACK_RIGHT].feedback)
+      {
+        odometry_.updateFromVelocity(
+          wheel_handles_[FRONT_LEFT].feedback->get().get_value(),
+          wheel_handles_[FRONT_RIGHT].feedback->get().get_value(),
+          wheel_handles_[BACK_LEFT].feedback->get().get_value(),
+          wheel_handles_[BACK_RIGHT].feedback->get().get_value(),
+          time);
+      }
+      else
+      {
+        RCLCPP_ERROR(logger, "Wheel feedback handles are not available");
+        return controller_interface::return_type::ERROR;
+      }
     }
   }
 
@@ -585,10 +603,7 @@ bool MecanumDriveController::reset()
   std::swap(previous_commands_, empty);
 
   // Reset all wheel handles
-  for (auto & wheel_handle : wheel_handles_)
-  {
-    wheel_handle = WheelHandle();
-  }
+  wheel_handles_ = std::array<WheelHandle, 4>();
 
   subscriber_is_active_ = false;
   velocity_command_subscriber_.reset();
