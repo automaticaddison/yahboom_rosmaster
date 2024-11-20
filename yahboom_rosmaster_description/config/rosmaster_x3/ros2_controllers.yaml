@@ -1,0 +1,78 @@
+# controller_manager provides the necessary infrastructure to manage multiple controllers
+# efficiently and robustly using ROS 2 Control.
+controller_manager:
+ ros__parameters:
+   update_rate: 50  # Hz
+
+   # Declare the controllers
+   joint_state_broadcaster:
+     type: joint_state_broadcaster/JointStateBroadcaster
+
+   mecanum_drive_controller:
+     type: mecanum_drive_controller/MecanumDriveController
+
+# Parameters for the mecanum drive controller
+mecanum_drive_controller:
+ ros__parameters:
+   # Joint names
+   front_left_joint_name: front_left_wheel_joint
+   front_right_joint_name: front_right_wheel_joint
+   back_left_joint_name: back_left_wheel_joint
+   back_right_joint_name: back_right_wheel_joint
+
+   # Robot physical parameters
+   wheel_base: 0.16
+   wheel_separation: 0.169
+   wheel_radius: 0.0325
+   wheel_separation_multiplier: 1.0
+   front_left_wheel_radius_multiplier: 1.0
+   front_right_wheel_radius_multiplier: 1.0
+   back_left_wheel_radius_multiplier: 1.0
+   back_right_wheel_radius_multiplier: 1.0
+
+   # TF configuration
+   tf_frame_prefix_enable: false
+   tf_frame_prefix: ""
+   odom_frame_id: odom
+   base_frame_id: base_link
+
+   # Odometry parameters
+   pose_covariance_diagonal: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   twist_covariance_diagonal: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+   position_feedback: true
+   open_loop: false
+   enable_odom_tf: true
+
+   # Command handling
+   cmd_vel_timeout: 0.5
+   publish_limited_velocity: false
+   velocity_rolling_window_size: 10
+   publish_rate: 50.0
+
+   # Velocity limits
+   linear.x.has_velocity_limits: false
+   linear.x.has_acceleration_limits: false
+   linear.x.has_jerk_limits: false
+   linear.x.max_velocity: 0.0
+   linear.x.min_velocity: 0.0
+   linear.x.max_acceleration: 0.0
+   linear.x.max_jerk: 0.0
+   linear.x.min_jerk: 0.0
+   linear.y.has_velocity_limits: false
+   linear.y.has_acceleration_limits: false
+   linear.y.has_jerk_limits: false
+   linear.y.max_velocity: 0.0
+   linear.y.min_velocity: 0.0
+   linear.y.max_acceleration: 0.0
+   linear.y.max_jerk: 0.0
+   linear.y.min_jerk: 0.0
+   angular.z.has_velocity_limits: false
+   angular.z.has_acceleration_limits: false
+   angular.z.has_jerk_limits: false
+   angular.z.max_velocity: 0.0
+   angular.z.min_velocity: 0.0
+   angular.z.max_acceleration: 0.0
+   angular.z.min_acceleration: 0.0
+   angular.z.max_jerk: 0.0
+   angular.z.min_jerk: 0.0
+   

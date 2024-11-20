@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-#
-# Author: Addison Sears-Collins
-# Date: November 11, 2024
-# Description: Display the Yahboom (ROSMASTER) robot in RViz
-#
-# This file launches the robot state publisher, joint state publisher,
-# and RViz2 for visualizing the ROSMASTER robot.
+"""
+Launch RViz visualization for the Yahboom (ROSMASTER) robot.
+
+This launch file sets up the complete visualization environment for the robot,
+including robot state publisher, joint state publisher, and RViz2. It handles loading
+and processing of URDF/XACRO files and controller configurations.
+
+:author: Addison Sears-Collins
+:date: November 20, 2024
+"""
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -26,6 +29,17 @@ ARGUMENTS = [
 
 
 def generate_launch_description():
+    """Generate the launch description for the robot visualization.
+
+    This function sets up all necessary nodes and parameters for visualizing
+    the robot in RViz, including:
+    - Robot state publisher for broadcasting transforms
+    - Joint state publisher for simulating joint movements
+    - RViz for visualization
+
+    Returns:
+        LaunchDescription: Complete launch description for the visualization setup
+    """
     # Define filenames
     urdf_package = 'yahboom_rosmaster_description'
     urdf_filename = 'rosmaster_x3.urdf.xacro'
