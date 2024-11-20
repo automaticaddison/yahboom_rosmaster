@@ -16,9 +16,11 @@
 #include <chrono>
 #include <cmath>
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <vector>
+#include <array>
 
 // ROS 2 Controller interface
 #include "controller_interface/controller_interface.hpp"
@@ -41,6 +43,16 @@
 
 namespace mecanum_drive_controller
 {
+
+// Wheel position indices
+enum WheelIndex : size_t
+{
+  FRONT_LEFT = 0,
+  FRONT_RIGHT = 1,
+  BACK_LEFT = 2,
+  BACK_RIGHT = 3
+};
+
 /**
  * @brief Controller class for mecanum drive robots
  *
@@ -150,9 +162,19 @@ protected:
    */
   struct WheelHandle
   {
-    std::reference_wrapper<const hardware_interface::LoanedStateInterface> feedback;
-    std::reference_wrapper<hardware_interface::LoanedCommandInterface> velocity;
-  };
+    std::optional<std::reference_wrapper<const hardware_interface::LoanedStateInterface>> feedback{};
+    std::optional<std::reference_wrapper<hardware_interface::LoanedCommandInterface>> velocity{};
+
+    WheelHandle() = default;
+
+    WheelHandle(
+      const hardware_interface::LoanedStateInterface & feedback_handle,
+      hardware_interface::LoanedCommandInterface & velocity_handle)
+      : feedback(std::cref(feedback_handle)),
+      velocity(std::ref(velocity_handle))
+   {
+   }
+};
 
   /**
    * @brief Get the feedback type for the wheels
@@ -163,18 +185,15 @@ protected:
   /**
    * @brief Configure a single wheel
    * @param wheel_name Name of the wheel to configure
-   * @param registered_handle Handle to register the wheel interfaces
+   * @param wheel_index Index of the wheel in the handles array
    * @return Success/failure of wheel configuration
    */
   controller_interface::CallbackReturn configure_wheel(
     const std::string & wheel_name,
-    WheelHandle & registered_handle);
+    size_t wheel_index);
 
-  // Handles for each wheel of the mecanum drive
-  WheelHandle front_left_wheel_handle_;   // Front left wheel interface
-  WheelHandle front_right_wheel_handle_;  // Front right wheel interface
-  WheelHandle back_left_wheel_handle_;    // Back left wheel interface
-  WheelHandle back_right_wheel_handle_;   // Back right wheel interface
+  // Fixed array of 4 wheel handles for the mecanum drive
+  std::array<WheelHandle, 4> wheel_handles_;  // Handles for each wheel
 
   // ROS 2 parameter handling
   std::shared_ptr<ParamListener> param_listener_;  // Listens for parameter updates
@@ -191,8 +210,7 @@ protected:
     realtime_odometry_publisher_ = nullptr;
 
   // Publishers for transform data
-  std::shared_ptr<rclcpp::Publisher<tf2_msgs::msg::TFMessage>> odometry_transform_publisher_ =
-    nullptr;
+  std::shared_ptr<rclcpp::Publisher<tf2_msgs::msg::TFMessage>> odometry_transform_publisher_ = nullptr;
   std::shared_ptr<realtime_tools::RealtimePublisher<tf2_msgs::msg::TFMessage>>
     realtime_odometry_transform_publisher_ = nullptr;
 

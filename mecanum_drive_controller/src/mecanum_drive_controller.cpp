@@ -33,6 +33,7 @@
  */
 
 #include <memory>
+#include <optional>
 #include <queue>
 #include <string>
 #include <utility>
@@ -90,8 +91,10 @@ controller_interface::CallbackReturn MecanumDriveController::on_init()
 
 InterfaceConfiguration MecanumDriveController::command_interface_configuration() const
 {
-  // Configure velocity command interfaces for all four wheels
   std::vector<std::string> conf_names;
+  conf_names.reserve(4);  // Reserve space for all four wheels
+
+  // Add velocity command interfaces for each wheel
   conf_names.push_back(params_.front_left_joint_name + "/" + HW_IF_VELOCITY);
   conf_names.push_back(params_.front_right_joint_name + "/" + HW_IF_VELOCITY);
   conf_names.push_back(params_.back_left_joint_name + "/" + HW_IF_VELOCITY);
@@ -102,8 +105,10 @@ InterfaceConfiguration MecanumDriveController::command_interface_configuration()
 
 InterfaceConfiguration MecanumDriveController::state_interface_configuration() const
 {
-  // Configure state interfaces for all four wheels
   std::vector<std::string> conf_names;
+  conf_names.reserve(4);  // Reserve space for all four wheels
+
+  // Add state interfaces for each wheel
   conf_names.push_back(params_.front_left_joint_name + "/" + feedback_type());
   conf_names.push_back(params_.front_right_joint_name + "/" + feedback_type());
   conf_names.push_back(params_.back_left_joint_name + "/" + feedback_type());
@@ -178,23 +183,23 @@ controller_interface::return_type MecanumDriveController::update(
     if (params_.position_feedback)
     {
       odometry_.update(
-        front_left_wheel_handle_.feedback.get().get_value(),
-        front_right_wheel_handle_.feedback.get().get_value(),
-        back_left_wheel_handle_.feedback.get().get_value(),
-        back_right_wheel_handle_.feedback.get().get_value(),
+        wheel_handles_[FRONT_LEFT].feedback.get().get_value(),
+        wheel_handles_[FRONT_RIGHT].feedback.get().get_value(),
+        wheel_handles_[BACK_LEFT].feedback.get().get_value(),
+        wheel_handles_[BACK_RIGHT].feedback.get().get_value(),
         time);
     }
     else
     {
       odometry_.updateFromVelocity(
-        front_left_wheel_handle_.feedback.get().get_value(),
-        front_right_wheel_handle_.feedback.get().get_value(),
-        back_left_wheel_handle_.feedback.get().get_value(),
-        back_right_wheel_handle_.feedback.get().get_value(),
+        wheel_handles_[FRONT_LEFT].feedback.get().get_value(),
+        wheel_handles_[FRONT_RIGHT].feedback.get().get_value(),
+        wheel_handles_[BACK_LEFT].feedback.get().get_value(),
+        wheel_handles_[BACK_RIGHT].feedback.get().get_value(),
         time);
     }
   }
-// Get current wheel velocities
+
   tf2::Quaternion orientation;
   orientation.setRPY(0.0, 0.0, odometry_.getHeading());
 
@@ -286,11 +291,19 @@ controller_interface::return_type MecanumDriveController::update(
   const double back_right_velocity = (
     linear_command_x - linear_command_y + angular_command * (L + W)) / back_right_radius;
 
-  // Set wheel velocities
-  front_left_wheel_handle_.velocity.get().set_value(front_left_velocity);
-  front_right_wheel_handle_.velocity.get().set_value(front_right_velocity);
-  back_left_wheel_handle_.velocity.get().set_value(back_left_velocity);
-  back_right_wheel_handle_.velocity.get().set_value(back_right_velocity);
+  // Set wheel velocities using wheel indices
+  if (!wheel_handles_[FRONT_LEFT].velocity->get().set_value(front_left_velocity)) {
+    RCLCPP_ERROR(logger, "Failed to set front left wheel velocity");
+  }
+  if (!wheel_handles_[FRONT_RIGHT].velocity->get().set_value(front_right_velocity)) {
+    RCLCPP_ERROR(logger, "Failed to set front right wheel velocity");
+  }
+  if (!wheel_handles_[BACK_LEFT].velocity->get().set_value(back_left_velocity)) {
+    RCLCPP_ERROR(logger, "Failed to set back left wheel velocity");
+  }
+  if (!wheel_handles_[BACK_RIGHT].velocity->get().set_value(back_right_velocity)) {
+    RCLCPP_ERROR(logger, "Failed to set back right wheel velocity");
+  }
 
   return controller_interface::return_type::OK;
 }
@@ -314,8 +327,7 @@ controller_interface::CallbackReturn MecanumDriveController::on_configure(
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  const double wheel_separation =
-    params_.wheel_separation_multiplier * params_.wheel_separation;
+  const double wheel_separation = params_.wheel_separation_multiplier * params_.wheel_separation;
   const double wheel_base = params_.wheel_base;
   const double front_left_radius =
     params_.front_left_wheel_radius_multiplier * params_.wheel_radius;
@@ -338,6 +350,7 @@ controller_interface::CallbackReturn MecanumDriveController::on_configure(
   cmd_vel_timeout_ = std::chrono::milliseconds{static_cast<int>(params_.cmd_vel_timeout * 1000.0)};
   publish_limited_velocity_ = params_.publish_limited_velocity;
 
+  // Setup speed limiters
   limiter_linear_x_ = SpeedLimiter(
     params_.linear.x.has_velocity_limits, params_.linear.x.has_acceleration_limits,
     params_.linear.x.has_jerk_limits, params_.linear.x.min_velocity, params_.linear.x.max_velocity,
@@ -379,13 +392,10 @@ controller_interface::CallbackReturn MecanumDriveController::on_configure(
   // Initialize command subscriber
   velocity_command_subscriber_ = get_node()->create_subscription<Twist>(
     DEFAULT_COMMAND_TOPIC, rclcpp::SystemDefaultsQoS(),
-    [this](const std::shared_ptr<Twist> msg) -> void
-    {
+    [this](const std::shared_ptr<Twist> msg) -> void {
       if (!subscriber_is_active_)
       {
-        RCLCPP_WARN(
-          get_node()->get_logger(),
-          "Can't accept new commands. subscriber is inactive");
+        RCLCPP_WARN(get_node()->get_logger(), "Can't accept new commands. subscriber is inactive");
         return;
       }
       if ((msg->header.stamp.sec == 0) && (msg->header.stamp.nanosec == 0))
@@ -475,29 +485,26 @@ controller_interface::CallbackReturn MecanumDriveController::on_activate(
 {
   auto logger = get_node()->get_logger();
 
-  // Configure front left wheel
-  if (configure_wheel(params_.front_left_joint_name, front_left_wheel_handle_) ==
+  // Configure each wheel using the WheelIndex enum
+  if (configure_wheel(params_.front_left_joint_name, FRONT_LEFT) ==
     controller_interface::CallbackReturn::ERROR)
   {
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  // Configure front right wheel
-  if (configure_wheel(params_.front_right_joint_name, front_right_wheel_handle_) ==
+  if (configure_wheel(params_.front_right_joint_name, FRONT_RIGHT) ==
     controller_interface::CallbackReturn::ERROR)
   {
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  // Configure back left wheel
-  if (configure_wheel(params_.back_left_joint_name, back_left_wheel_handle_) ==
+  if (configure_wheel(params_.back_left_joint_name, BACK_LEFT) ==
     controller_interface::CallbackReturn::ERROR)
   {
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  // Configure back right wheel
-  if (configure_wheel(params_.back_right_joint_name, back_right_wheel_handle_) ==
+  if (configure_wheel(params_.back_right_joint_name, BACK_RIGHT) ==
     controller_interface::CallbackReturn::ERROR)
   {
     return controller_interface::CallbackReturn::ERROR;
@@ -519,10 +526,13 @@ controller_interface::CallbackReturn MecanumDriveController::on_deactivate(
     halt();
     is_halted = true;
   }
-  front_left_wheel_handle_ = WheelHandle();
-  front_right_wheel_handle_ = WheelHandle();
-  back_left_wheel_handle_ = WheelHandle();
-  back_right_wheel_handle_ = WheelHandle();
+
+  // Reset wheel handles using WheelIndex
+  for (size_t i = 0; i < wheel_handles_.size(); ++i)
+  {
+    wheel_handles_[i] = WheelHandle();
+  }
+
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
@@ -548,6 +558,24 @@ controller_interface::CallbackReturn MecanumDriveController::on_error(
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
+controller_interface::CallbackReturn MecanumDriveController::on_shutdown(
+  const rclcpp_lifecycle::State &)
+{
+  return controller_interface::CallbackReturn::SUCCESS;
+}
+
+void MecanumDriveController::halt()
+{
+  for (auto & wheel_handle : wheel_handles_)
+  {
+    if (wheel_handle.velocity) {
+      if (!wheel_handle.velocity->get().set_value(0.0)) {
+        RCLCPP_ERROR(get_node()->get_logger(), "Failed to halt wheel velocity");
+      }
+    }
+  }
+}
+
 bool MecanumDriveController::reset()
 {
   odometry_.resetOdometry();
@@ -556,11 +584,11 @@ bool MecanumDriveController::reset()
   std::queue<Twist> empty;
   std::swap(previous_commands_, empty);
 
-  // Clear wheel handles
-  front_left_wheel_handle_ = WheelHandle();
-  front_right_wheel_handle_ = WheelHandle();
-  back_left_wheel_handle_ = WheelHandle();
-  back_right_wheel_handle_ = WheelHandle();
+  // Reset all wheel handles
+  for (auto & wheel_handle : wheel_handles_)
+  {
+    wheel_handle = WheelHandle();
+  }
 
   subscriber_is_active_ = false;
   velocity_command_subscriber_.reset();
@@ -570,23 +598,9 @@ bool MecanumDriveController::reset()
   return true;
 }
 
-controller_interface::CallbackReturn MecanumDriveController::on_shutdown(
-  const rclcpp_lifecycle::State &)
-{
-  return controller_interface::CallbackReturn::SUCCESS;
-}
-
-void MecanumDriveController::halt()
-{
-  front_left_wheel_handle_.velocity.get().set_value(0.0);
-  front_right_wheel_handle_.velocity.get().set_value(0.0);
-  back_left_wheel_handle_.velocity.get().set_value(0.0);
-  back_right_wheel_handle_.velocity.get().set_value(0.0);
-}
-
 controller_interface::CallbackReturn MecanumDriveController::configure_wheel(
   const std::string & wheel_name,
-  WheelHandle & registered_handle)
+  size_t wheel_index)
 {
   auto logger = get_node()->get_logger();
 
@@ -620,7 +634,8 @@ controller_interface::CallbackReturn MecanumDriveController::configure_wheel(
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  registered_handle = WheelHandle{std::ref(*state_handle), std::ref(*command_handle)};
+  // Store the wheel handle at the specified index
+  wheel_handles_[wheel_index] = WheelHandle(*state_handle, *command_handle);
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
