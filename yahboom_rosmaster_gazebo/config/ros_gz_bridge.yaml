@@ -1,0 +1,30 @@
+# RGBD Camera topics
+- ros_topic_name: "cam_1/depth/camera_info"
+  gz_topic_name: "cam_1/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+  lazy: true # Determines whether connections are created immediately at startup (when false) or only when data is actually requested by a subscriber (when true), helping to conserve system resources at the cost of potential initial delays in data flow.
+
+- ros_topic_name: "cam_1/depth/color/points"
+  gz_topic_name: "cam_1/points"
+  ros_type_name: "sensor_msgs/msg/PointCloud2"
+  gz_type_name: "gz.msgs.PointCloudPacked"
+  direction: GZ_TO_ROS
+  lazy: true
+
+  # LIDAR configuration
+- ros_topic_name: "scan"
+  gz_topic_name: "scan"
+  ros_type_name: "sensor_msgs/msg/LaserScan"
+  gz_type_name: "gz.msgs.LaserScan"
+  direction: GZ_TO_ROS
+  lazy: true
+
+# IMU configuration
+- ros_topic_name: "imu/data"
+  gz_topic_name: "imu/data"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+  lazy: true

@@ -86,7 +86,7 @@
         <specular>${gazebo_material_specular}</specular>
       </material>
       <sensor name="${prefix}lidar_sensor" type="gpu_lidar">
-        <topic>${prefix}${topic_name}</topic>
+        <topic>${topic_name}</topic>
         <update_rate>${update_rate}</update_rate>
         <always_on>${always_on}</always_on>
         <visualize>${visualize}</visualize>

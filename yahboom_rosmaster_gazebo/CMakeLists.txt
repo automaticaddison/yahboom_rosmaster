@@ -19,6 +19,12 @@ find_package(ros2_controllers REQUIRED)
 find_package(trajectory_msgs REQUIRED)
 find_package(xacro REQUIRED)
 
+# Copy necessary files to designated locations in the project
+install (
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
