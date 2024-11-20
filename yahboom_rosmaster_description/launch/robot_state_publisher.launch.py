@@ -142,6 +142,7 @@ def generate_launch_description():
 
     robot_description_content = ParameterValue(Command([
         'xacro', ' ', urdf_model, ' ',
+        'robot_name:=', LaunchConfiguration('robot_name'), ' ',
         'prefix:=', LaunchConfiguration('prefix'), ' ',
         'use_gazebo:=', LaunchConfiguration('use_gazebo')
     ]), value_type=str)

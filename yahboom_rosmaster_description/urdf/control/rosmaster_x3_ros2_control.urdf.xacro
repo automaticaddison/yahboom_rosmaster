@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+    <xacro:macro name="yahboom_rosmaster_ros2_control" params="prefix use_gazebo">
+        <ros2_control name="RobotSystem" type="system">
+            <hardware>
+                <xacro:if value="${use_gazebo}">
+                    <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+                </xacro:if>
+            </hardware>
+
+            <joint name="${prefix}front_left_wheel_joint">
+              <command_interface name="velocity">
+                  <param name="min">-50.0</param>
+                  <param name="max">50.0</param>
+              </command_interface>
+              <state_interface name="position"/>
+              <state_interface name="velocity"/>
+          </joint>
+
+          <joint name="${prefix}front_right_wheel_joint">
+              <command_interface name="velocity">
+                  <param name="min">-50.0</param>
+                  <param name="max">50.0</param>
+              </command_interface>
+              <state_interface name="position"/>
+              <state_interface name="velocity"/>
+          </joint>
+
+          <joint name="${prefix}back_left_wheel_joint">
+              <command_interface name="velocity">
+                  <param name="min">-50.0</param>
+                  <param name="max">50.0</param>
+              </command_interface>
+              <state_interface name="position"/>
+              <state_interface name="velocity"/>
+          </joint>
+
+          <joint name="${prefix}back_right_wheel_joint">
+              <command_interface name="velocity">
+                  <param name="min">-50.0</param>
+                  <param name="max">50.0</param>
+              </command_interface>
+              <state_interface name="position"/>
+              <state_interface name="velocity"/>
+          </joint>
+
+      </ros2_control>
+  </xacro:macro>
+
+</robot>

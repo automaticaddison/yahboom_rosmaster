@@ -3,6 +3,7 @@
 
     <xacro:property name="M_PI" value="3.1415926535897931" />
 
+    <xacro:arg name="robot_name" default="rosmaster_x3"/>
     <xacro:arg name="prefix" default=""/>
     <xacro:arg name="use_gazebo" default="false"/>
 
@@ -62,5 +63,15 @@
       rpy_offset="0 0 0"
       update_rate="15.0"
       topic_name="imu/data"/>
+
+      <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/control/gazebo_sim_ros2_control.urdf.xacro" />
+      <xacro:load_gazebo_sim_ros2_control_plugin
+        robot_name="$(arg robot_name)"
+        use_gazebo="$(arg use_gazebo)"/>
+
+      <xacro:include filename="$(find yahboom_rosmaster_description)/urdf/control/rosmaster_x3_ros2_control.urdf.xacro" />
+      <xacro:yahboom_rosmaster_ros2_control
+        prefix="$(arg prefix)"
+        use_gazebo="$(arg use_gazebo)"/>
 
 </robot>
