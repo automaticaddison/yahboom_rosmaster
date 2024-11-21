@@ -13,6 +13,7 @@
 <xacro:property name="base_mass" value="4.6" />
 
 <xacro:macro name="rosmaster_x3_base" params="prefix">
+  <link name="${prefix}base_footprint"/>
   <link name="${prefix}base_link">
     <visual>
         <geometry>
@@ -47,5 +48,10 @@
         </material>
     </visual>
   </gazebo>
+  <joint name="${prefix}base_joint" type="fixed">
+    <parent link="${prefix}base_footprint"/>
+    <child link="${prefix}base_link"/>
+    <origin xyz="0 0 ${wheel_radius}" rpy="0 0 0"/>
+  </joint>
 </xacro:macro>
 </robot>

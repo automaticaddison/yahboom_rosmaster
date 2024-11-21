@@ -2,7 +2,7 @@
 # efficiently and robustly using ROS 2 Control.
 controller_manager:
  ros__parameters:
-   update_rate: 10  # Hz
+   update_rate: 50  # Hz
 
    # Declare the controllers
    joint_state_broadcaster:
@@ -34,13 +34,13 @@ mecanum_drive_controller:
    tf_frame_prefix_enable: false
    tf_frame_prefix: ""
    odom_frame_id: odom
-   base_frame_id: base_link
+   base_frame_id: base_footprint
 
    # Odometry parameters
    pose_covariance_diagonal: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
    twist_covariance_diagonal: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
    position_feedback: true
-   open_loop: false
+   open_loop: true
    enable_odom_tf: true
 
    # Command handling

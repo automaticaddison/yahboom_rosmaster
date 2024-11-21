@@ -97,7 +97,7 @@ mecanum_drive_controller:
   }
   base_frame_id: {
     type: string,
-    default_value: "base_link",
+    default_value: "base_footprint",
     description: "Name of the robot's base frame that is child of the odometry frame",
   }
   pose_covariance_diagonal: {
@@ -117,7 +117,7 @@ mecanum_drive_controller:
   }
   open_loop: {
     type: bool,
-    default_value: false,
+    default_value: true,
     description: "If set to true the odometry of the robot will be calculated from the commanded values and not from feedback",
   }
   enable_odom_tf: {
