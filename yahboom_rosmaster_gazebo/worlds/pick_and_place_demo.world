@@ -46,7 +46,6 @@
       </uri>
     </include>
 
-    <!-- Local Ground Plane with modified friction -->
     <model name="ground_plane">
       <static>true</static>
       <link name="ground_plane">
@@ -79,6 +78,13 @@
         </visual>
       </link>
     </model>
+    <!-- Local Ground Plane
+    <include>
+      <uri>
+        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Ground Plane
+      </uri>
+    </include>
+    -->
 
     <!-- Include the cylinder model -->
     <include>
