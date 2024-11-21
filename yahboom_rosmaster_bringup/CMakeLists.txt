@@ -13,7 +13,7 @@ find_package(ament_cmake REQUIRED)
 
 # Copy necessary files to designated locations in the project
 install (
-  DIRECTORY launch
+  DIRECTORY launch scripts
   DESTINATION share/${PROJECT_NAME}
 )
 
