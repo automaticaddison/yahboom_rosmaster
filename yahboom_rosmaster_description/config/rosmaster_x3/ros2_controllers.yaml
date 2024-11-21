@@ -2,7 +2,7 @@
 # efficiently and robustly using ROS 2 Control.
 controller_manager:
  ros__parameters:
-   update_rate: 50  # Hz
+   update_rate: 10  # Hz
 
    # Declare the controllers
    joint_state_broadcaster:
@@ -75,4 +75,4 @@ mecanum_drive_controller:
    angular.z.min_acceleration: 0.0
    angular.z.max_jerk: 0.0
    angular.z.min_jerk: 0.0
-   
+

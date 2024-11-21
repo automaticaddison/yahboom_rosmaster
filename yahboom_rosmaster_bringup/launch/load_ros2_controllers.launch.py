@@ -7,11 +7,7 @@ for operating the mecanum wheel robot in a specific sequence.
 
 Launched Controllers:
     1. Joint State Broadcaster: Publishes joint states to /joint_states
-    2. Mecanum Drive Controller: Controls the robot's mecanum drive movements via /cmd_vel
-
-Launch Sequence:
-    1. Joint State Broadcaster
-    2. Mecanum Drive Controller (starts after Joint State Broadcaster)
+    2. Mecanum Drive Controller: Controls the robot's mecanum drive movements via ~/cmd_vel
 
 :author: Addison Sears-Collins
 :date: November 20, 2024
@@ -26,8 +22,7 @@ def generate_launch_description():
     """Generate a launch description for sequentially starting robot controllers.
 
     The function creates a launch sequence that ensures controllers are started
-    in the correct order, with the joint state broadcaster starting first,
-    followed by the mecanum drive controller.
+    in the correct order.
 
     Returns:
         LaunchDescription: Launch description containing sequenced controller starts
@@ -50,8 +45,8 @@ def generate_launch_description():
     # Launch the mecanum drive controller after the joint state broadcaster
     load_mecanum_drive_controller = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=start_joint_state_broadcaster_cmd,
-            on_exit=[start_mecanum_drive_controller_cmd]
+            target_action=start_mecanum_drive_controller_cmd,
+            on_exit=[start_joint_state_broadcaster_cmd]
         )
     )
 

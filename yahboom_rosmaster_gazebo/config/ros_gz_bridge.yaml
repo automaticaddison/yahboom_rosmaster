@@ -28,3 +28,4 @@
   gz_type_name: "gz.msgs.IMU"
   direction: GZ_TO_ROS
   lazy: true
+
