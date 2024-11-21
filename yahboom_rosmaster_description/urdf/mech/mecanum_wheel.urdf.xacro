@@ -56,20 +56,6 @@
               </torsional>
           </friction>
       </surface>
-    </gazebo>
-
-    <gazebo reference="${prefix}${side}_wheel_link">
-      <surface>
-          <friction>
-              <ode>
-                  <mu>0.01</mu>
-                  <mu2>0.01</mu2>
-              </ode>
-              <torsional>
-                  <coefficient>0.0</coefficient>
-              </torsional>
-          </friction>
-      </surface>
       <visual>
           <material>
               <ambient>0.2 0.2 0.2 1.0</ambient>

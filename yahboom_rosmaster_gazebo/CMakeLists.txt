@@ -21,7 +21,7 @@ find_package(xacro REQUIRED)
 
 # Copy necessary files to designated locations in the project
 install (
-  DIRECTORY config launch models worlds
+  DIRECTORY config launch models rviz worlds
   DESTINATION share/${PROJECT_NAME}
 )
 

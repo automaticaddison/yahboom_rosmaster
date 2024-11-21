@@ -47,6 +47,7 @@ def generate_launch_description():
     default_world_file = 'empty.world'
     gazebo_worlds_path = 'worlds'
     ros_gz_bridge_config_file_path = 'config/ros_gz_bridge.yaml'
+    rviz_config_filename = 'yahboom_rosmaster_gazebo_sim.rviz'
 
     # Set the path to different files and folders
     pkg_ros_gz_sim = FindPackageShare(package='ros_gz_sim').find('ros_gz_sim')
@@ -57,12 +58,15 @@ def generate_launch_description():
 
     default_ros_gz_bridge_config_file_path = os.path.join(
         pkg_share_gazebo, ros_gz_bridge_config_file_path)
+    default_rviz_config_path = PathJoinSubstitution(
+        [pkg_share_gazebo, 'rviz', rviz_config_filename])
     gazebo_models_path = os.path.join(pkg_share_gazebo, gazebo_models_path)
 
     # Launch configuration variables
     jsp_gui = LaunchConfiguration('jsp_gui')
     load_controllers = LaunchConfiguration('load_controllers')
     robot_name = LaunchConfiguration('robot_name')
+    rviz_config_file = LaunchConfiguration('rviz_config_file')
     use_rviz = LaunchConfiguration('use_rviz')
     use_gazebo = LaunchConfiguration('use_gazebo')
     use_robot_state_pub = LaunchConfiguration('use_robot_state_pub')
@@ -88,6 +92,11 @@ def generate_launch_description():
         name='robot_name',
         default_value=default_robot_name,
         description='The name for the robot')
+
+    declare_rviz_config_file_cmd = DeclareLaunchArgument(
+        name='rviz_config_file',
+        default_value=default_rviz_config_path,
+        description='Full path to the RVIZ config file to use')
 
     declare_load_controllers_cmd = DeclareLaunchArgument(
         name='load_controllers',
@@ -163,6 +172,7 @@ def generate_launch_description():
         ]),
         launch_arguments={
             'jsp_gui': jsp_gui,
+            'rviz_config_file': rviz_config_file,
             'use_rviz': use_rviz,
             'use_gazebo': use_gazebo,
             'use_sim_time': use_sim_time
@@ -236,6 +246,7 @@ def generate_launch_description():
 
     # Declare the launch options
     ld.add_action(declare_robot_name_cmd)
+    ld.add_action(declare_rviz_config_file_cmd)
     ld.add_action(declare_jsp_gui_cmd)
     ld.add_action(declare_load_controllers_cmd)
     ld.add_action(declare_use_rviz_cmd)
