@@ -27,13 +27,6 @@ def generate_launch_description():
     Returns:
         LaunchDescription: Launch description containing sequenced controller starts
     """
-    # Start joint state broadcaster
-    start_joint_state_broadcaster_cmd = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
-        output='screen'
-    )
-
     # Start mecanum drive controller
     start_mecanum_drive_controller_cmd = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
@@ -41,20 +34,24 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Register event handler for sequencing
-    # Launch the mecanum drive controller after the joint state broadcaster
-    load_mecanum_drive_controller = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=start_mecanum_drive_controller_cmd,
-            on_exit=[start_joint_state_broadcaster_cmd]
-        )
+    # Start joint state broadcaster
+    start_joint_state_broadcaster_cmd = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'joint_state_broadcaster'],
+        output='screen'
     )
+
+    # Register event handler for sequencing
+    load_joint_state_broadcaster_cmd = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=start_joint_state_broadcaster_cmd,
+            on_exit=[start_mecanum_drive_controller_cmd]))
 
     # Create and populate the launch description
     ld = LaunchDescription()
 
     # Add the actions to the launch description in sequence
     ld.add_action(start_joint_state_broadcaster_cmd)
-    ld.add_action(load_mecanum_drive_controller)
+    ld.add_action(load_joint_state_broadcaster_cmd)
 
     return ld
