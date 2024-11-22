@@ -13,6 +13,13 @@
   direction: GZ_TO_ROS
   lazy: true
 
+- ros_topic_name: "cam_1/depth/image_raw"
+  gz_topic_name: "cam_1/depth_image"
+  ros_type_name: "sensor_msgs/msg/Image"
+  gz_type_name: "gz.msgs.Image"
+  direction: GZ_TO_ROS
+  lazy: true
+
   # LIDAR configuration
 - ros_topic_name: "scan"
   gz_topic_name: "scan"

@@ -216,12 +216,10 @@ def generate_launch_description():
         package='ros_gz_image',
         executable='image_bridge',
         arguments=[
-            '/cam_1/depth_image',
-            '/cam_1/image',
+            '/cam_1/image'
         ],
         remappings=[
-            ('/cam_1/depth_image', '/cam_1/depth/image_rect_raw'),
-            ('/cam_1/image', '/cam_1/color/image_raw'),
+            ('/cam_1/image', '/cam_1/color/image_raw')
         ])
 
     # Spawn the robot
