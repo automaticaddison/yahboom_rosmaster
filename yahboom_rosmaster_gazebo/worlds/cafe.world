@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
   <world name="default">
+
     <!-- Plugin for simulating physics -->
     <plugin
       filename="gz-sim-physics-system"
@@ -44,7 +45,7 @@
       </attenuation>
       <direction>-0.5 0.1 -0.9</direction>
     </light>
-    
+
     <model name="ground_plane">
       <static>true</static>
       <link name="link">
@@ -79,7 +80,7 @@
         </visual>
       </link>
     </model>
-    
+
     <include>
       <uri>model://cafe</uri>
     </include>
