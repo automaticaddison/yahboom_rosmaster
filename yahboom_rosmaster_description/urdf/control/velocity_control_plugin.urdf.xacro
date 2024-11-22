@@ -6,7 +6,7 @@
                 <plugin
                     filename="gz-sim-velocity-control-system"
                     name="gz::sim::systems::VelocityControl">
-                    <topic>cmd_vel</topic>
+                    <topic>mecanum_drive_controller/cmd_vel</topic>
                     <initial_linear>0 0 0</initial_linear>
                     <initial_angular>0 0 0</initial_angular>
                 </plugin>

@@ -29,3 +29,11 @@
   direction: GZ_TO_ROS
   lazy: true
 
+# Sending velocity commands from ROS 2 to Gazebo
+- ros_topic_name: "mecanum_drive_controller/cmd_vel"
+  gz_topic_name: "mecanum_drive_controller/cmd_vel"
+  ros_type_name: "geometry_msgs/msg/TwistStamped"
+  gz_type_name: "gz.msgs.Twist"
+  direction: ROS_TO_GZ
+  lazy: true
+
