@@ -50,7 +50,6 @@
           <ode>
               <mu>1.0</mu>
               <mu2>0.0</mu2>
-              <fdir1>${x_reflect} ${y_reflect} 0</fdir1>
           </ode>
         </friction>
       </surface>

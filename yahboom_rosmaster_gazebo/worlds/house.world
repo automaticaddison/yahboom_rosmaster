@@ -4,9 +4,6 @@
         <plugin
           filename="gz-sim-physics-system"
           name="gz::sim::systems::Physics">
-          <engine>
-            <filename>libgz-physics-bullet-featherstone-plugin.so</filename>
-          </engine>
         </plugin>
         <plugin
             filename="gz-sim-user-commands-system"
@@ -29,9 +26,6 @@
           name="gz::sim::systems::Imu">
         </plugin>
 
-        <!-- To add realistic gravity, do: 0.0 0.0 -9.8, otherwise do 0.0 0.0 0.0 -->
-        <gravity>0.0 0.0 -9.8</gravity>
-
         <scene>
             <ambient>0.4 0.4 0.4 1</ambient>
             <background>0.7 0.7 0.7 1</background>
@@ -40,41 +34,41 @@
             <origin_visual>false</origin_visual>
         </scene>
 
-<!-- Local ground plane with modified friction -->
-<model name="ground_plane">
-    <static>true</static>
-    <link name="link">
-        <collision name="collision">
-            <geometry>
-                <plane>
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+              <collision name="collision">
+                <geometry>
+                  <plane>
                     <normal>0 0 1</normal>
                     <size>100 100</size>
-                </plane>
-            </geometry>
-            <surface>
-                <friction>
-                    <torsional>
-                        <coefficient>0.0</coefficient>
-                    </torsional>
-                </friction>
-            </surface>
-        </collision>
-        <visual name="visual">
-            <geometry>
-                <plane>
+                  </plane>
+                </geometry>
+                <surface>
+                  <friction>
+                    <ode>
+                      <mu>0.0</mu>
+                      <mu2>0.0</mu2>
+                    </ode>
+                  </friction>
+                </surface>
+              </collision>
+              <visual name="visual">
+                <geometry>
+                  <plane>
                     <normal>0 0 1</normal>
                     <size>100 100</size>
-                </plane>
-            </geometry>
-            <material>
-                <!-- Light oak/maple wood color -->
-                <ambient>0.92 0.85 0.7 1</ambient>
-                <diffuse>0.92 0.85 0.7 1</diffuse>
-                <specular>0.1 0.1 0.1 1</specular>
-            </material>
-        </visual>
-    </link>
-</model>
+                  </plane>
+                </geometry>
+                <material>
+                  <ambient>0.8 0.8 0.8 1</ambient>
+                  <diffuse>0.8 0.8 0.8 1</diffuse>
+                  <specular>0.8 0.8 0.8 1</specular>
+                </material>
+              </visual>
+            </link>
+          </model>
+
         <model name='HouseWallB_01_001'>
             <static>true</static>
             <include>

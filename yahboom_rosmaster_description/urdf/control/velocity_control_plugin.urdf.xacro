@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="load_velocity_control_plugin" params="use_gazebo">
+        <xacro:if value="${use_gazebo}">
+            <gazebo>
+                <plugin
+                    filename="gz-sim-velocity-control-system"
+                    name="gz::sim::systems::VelocityControl">
+                    <topic>cmd_vel</topic>
+                    <initial_linear>0 0 0</initial_linear>
+                    <initial_angular>0 0 0</initial_angular>
+                </plugin>
+            </gazebo>
+        </xacro:if>
+    </xacro:macro>
+</robot>

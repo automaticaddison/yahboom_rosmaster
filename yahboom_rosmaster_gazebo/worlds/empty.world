@@ -3,11 +3,6 @@
 <sdf version="1.6">
   <world name="default">
 
-    <physics name="1ms" type="ignored">
-      <max_step_size>0.001</max_step_size>
-      <real_time_factor>1.0</real_time_factor>
-    </physics>
-
     <!-- Plugin for simulating physics -->
     <plugin
       filename="gz-sim-physics-system"
@@ -38,7 +33,7 @@
       name="gz::sim::systems::Imu">
     </plugin>
 
-    <light type="directional" name="sun">
+     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
       <pose>0 0 10 0 0 0</pose>
       <diffuse>1 1 1 1</diffuse>
@@ -65,7 +60,8 @@
           <surface>
             <friction>
               <ode>
-                <mu>50</mu>
+                <mu>0.0</mu>
+                <mu2>0.0</mu2>
               </ode>
             </friction>
           </surface>
