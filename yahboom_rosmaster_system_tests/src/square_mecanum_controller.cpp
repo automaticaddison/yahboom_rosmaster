@@ -39,7 +39,7 @@ public:
         // Initialize variables
         current_side_ = 0;  // Which side of square we're on (0-3)
         elapsed_time_ = 0.0;  // Time spent on current side
-        robot_speed_ = 0.5;  // Speed in meters/second
+        robot_speed_ = 0.2;  // Speed in meters/second
         side_length_ = 2.0;  // Length of each side in meters
         time_per_side_ = side_length_ / robot_speed_;  // Time to complete one side
     }
