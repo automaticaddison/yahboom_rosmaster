@@ -14,7 +14,7 @@ Launched Controllers:
 """
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, RegisterEventHandler
+from launch.actions import ExecuteProcess, RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessExit
 
 
@@ -41,6 +41,12 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Add delay to joint state broadcaster
+    delayed_start = TimerAction(
+        period=20.0,
+        actions=[start_joint_state_broadcaster_cmd]
+    )
+
     # Register event handler for sequencing
     load_joint_state_broadcaster_cmd = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -51,7 +57,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add the actions to the launch description in sequence
-    ld.add_action(start_joint_state_broadcaster_cmd)
+    ld.add_action(delayed_start)
     ld.add_action(load_joint_state_broadcaster_cmd)
 
     return ld
