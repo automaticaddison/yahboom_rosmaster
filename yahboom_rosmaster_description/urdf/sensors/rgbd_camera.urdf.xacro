@@ -43,7 +43,7 @@
     image_height:=240
     clip_near:=0.05
     clip_far:=1.5
-    update_rate:=5
+    update_rate:=2
     always_on:=1
     visualize:=true
     enable_collision:=false">
