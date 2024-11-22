@@ -46,15 +46,13 @@
 
     <gazebo reference="${prefix}${side}_wheel_link">
       <surface>
-          <friction>
-              <ode>
-                  <mu>0.01</mu>
-                  <mu2>0.01</mu2>
-              </ode>
-              <torsional>
-                  <coefficient>0.0</coefficient>
-              </torsional>
-          </friction>
+        <friction>
+          <ode>
+              <mu>1.0</mu>
+              <mu2>0.0</mu2>
+              <fdir1>${x_reflect} ${y_reflect} 0</fdir1>
+          </ode>
+        </friction>
       </surface>
       <visual>
           <material>

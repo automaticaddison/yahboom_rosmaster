@@ -3,13 +3,15 @@
 <sdf version="1.6">
   <world name="default">
 
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+
     <!-- Plugin for simulating physics -->
     <plugin
       filename="gz-sim-physics-system"
       name="gz::sim::systems::Physics">
-      <engine>
-        <filename>libgz-physics-bullet-featherstone-plugin.so</filename>
-      </engine>
     </plugin>
 
     <!-- Plugin for handling user commands -->
@@ -36,31 +38,35 @@
       name="gz::sim::systems::Imu">
     </plugin>
 
-    <!-- To add realistic gravity, do: 0.0 0.0 -9.8, otherwise do 0.0 0.0 0.0 -->
-    <gravity>0.0 0.0 -9.8</gravity>
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.5 0.5 0.5 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
 
-    <!-- Include a model of the Sun from an external URI -->
-    <include>
-      <uri>
-        https://fuel.gazebosim.org/1.0/OpenRobotics/models/Sun
-      </uri>
-    </include>
-
-    <!-- Local Ground Plane with modified friction -->
     <model name="ground_plane">
       <static>true</static>
-      <link name="ground_plane">
+      <link name="link">
         <collision name="collision">
           <geometry>
             <plane>
               <normal>0 0 1</normal>
+              <size>100 100</size>
             </plane>
           </geometry>
           <surface>
             <friction>
-              <torsional>
-                <coefficient>0.0</coefficient>
-              </torsional>
+              <ode>
+                <mu>50</mu>
+              </ode>
             </friction>
           </surface>
         </collision>
@@ -79,11 +85,6 @@
         </visual>
       </link>
     </model>
-
-    <!-- Define scene properties -->
-    <scene>
-      <shadows>false</shadows>
-    </scene>
 
   </world>
 </sdf>
