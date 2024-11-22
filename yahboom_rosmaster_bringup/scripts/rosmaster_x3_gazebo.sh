@@ -18,7 +18,7 @@ trap 'cleanup' SIGINT
 echo "Launching Gazebo simulation..."
 ros2 launch yahboom_rosmaster_gazebo yahboom_rosmaster.gazebo.launch.py \
     load_controllers:=true \
-    world_file:=house.world \
+    world_file:=empty.world \
     use_rviz:=true \
     use_robot_state_pub:=true \
     use_sim_time:=true \
