@@ -1,0 +1,8 @@
+# Desired parameter values
+/mecanum_parameters_node:
+  ros__parameters:
+    robot_name: "New Automatic Addison Bot"
+    robot_id: 82
+    target_linear_velocity_x: 0.0
+    target_linear_velocity_y: 0.0
+    target_angular_velocity: 0.23
