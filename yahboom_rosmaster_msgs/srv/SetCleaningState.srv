@@ -1,0 +1,5 @@
+# Request
+bool desired_cleaning_state  # Request: true to start cleaning, false to stop
+---
+bool success                 # Response: whether the request was successful
+string message               # Response: information about the result
