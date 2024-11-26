@@ -1,23 +1,21 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>yahboom_rosmaster_system_tests</name>
+  <name>yahboom_rosmaster_msgs</name>
   <version>0.0.0</version>
-  <description>Integration and system tests for verifying Yahboom ROSMASTER robot functionality</description>
+  <description>Custom messages, services, and actions for the Yahboom ROSMaster robot</description>
   <maintainer email="automaticaddison@todo.com">ubuntu</maintainer>
   <license>BSD-3-Clause</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>rclcpp_action</depend>
-  <depend>geometry_msgs</depend>
-  <depend>std_msgs</depend>
-  <depend>rcl_interfaces</depend>
-  <depend>yahboom_rosmaster_msgs</depend>
+  <exec_depend>rosidl_default_runtime</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
+
+  <member_of_group>rosidl_interface_packages</member_of_group>
 
   <export>
     <build_type>ament_cmake</build_type>
