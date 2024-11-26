@@ -35,6 +35,11 @@ add_executable(timed_rotation_action_server
   src/timed_rotation_action_server.cpp
 )
 
+# Add the timed rotation action client executable
+add_executable(timed_rotation_action_client
+  src/timed_rotation_action_client.cpp
+)
+
 # Specify dependencies for the target
 ament_target_dependencies(square_mecanum_controller
   rclcpp
@@ -58,11 +63,20 @@ ament_target_dependencies(timed_rotation_action_server
   yahboom_rosmaster_msgs
 )
 
+# Specify dependencies for the timed rotation action client
+ament_target_dependencies(timed_rotation_action_client
+  rclcpp
+  rclcpp_action
+  yahboom_rosmaster_msgs
+  std_msgs
+)
+
 # Install the executables
 install(TARGETS
   square_mecanum_controller
   mecanum_parameters_node
   timed_rotation_action_server
+  timed_rotation_action_client
   DESTINATION lib/${PROJECT_NAME}
 )
 
