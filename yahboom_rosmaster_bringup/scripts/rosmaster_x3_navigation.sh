@@ -21,6 +21,7 @@ trap 'cleanup' SIGINT
 
 echo "Launching Gazebo simulation with Nav2..."
 ros2 launch yahboom_rosmaster_navigation rosmaster_x3_navigation_launch.py \
+   enable_odom_tf:=false \
    headless:=False \
    load_controllers:=true \
    world_file:=cafe.world \
