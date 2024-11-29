@@ -209,7 +209,8 @@ def generate_launch_description():
     start_ekf_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ekf_launch_file]),
         launch_arguments={
-            'ekf_config_file': ekf_config_file
+            'ekf_config_file': ekf_config_file,
+            'use_sim_time': use_sim_time
         }.items()
     )
 
@@ -248,7 +249,7 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
 
     # Add any actions
-    ld.add_action(start_gazebo_cmd)
     ld.add_action(start_ekf_cmd)
+    ld.add_action(start_gazebo_cmd)
 
     return ld
