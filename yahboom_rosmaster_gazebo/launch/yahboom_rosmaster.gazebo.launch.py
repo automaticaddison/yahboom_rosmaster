@@ -18,7 +18,7 @@ from launch.actions import (
 )
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -63,6 +63,7 @@ def generate_launch_description():
     gazebo_models_path = os.path.join(pkg_share_gazebo, gazebo_models_path)
 
     # Launch configuration variables
+    headless = LaunchConfiguration('headless')
     jsp_gui = LaunchConfiguration('jsp_gui')
     load_controllers = LaunchConfiguration('load_controllers')
     robot_name = LaunchConfiguration('robot_name')
@@ -88,6 +89,11 @@ def generate_launch_description():
     yaw = LaunchConfiguration('yaw')
 
     # Declare the launch arguments
+    declare_headless_cmd = DeclareLaunchArgument(
+        name='headless',
+        default_value='False',
+        description='Whether to execute gzclient (visualization)')
+
     declare_robot_name_cmd = DeclareLaunchArgument(
         name='robot_name',
         default_value=default_robot_name,
@@ -197,10 +203,17 @@ def generate_launch_description():
         gazebo_models_path)
 
     # Start Gazebo
-    start_gazebo_cmd = IncludeLaunchDescription(
+    start_gazebo_server_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments=[('gz_args', [' -r -v 4 ', world_path])])
+        launch_arguments=[('gz_args', [' -r -s -v 4 ', world_path])])
+
+    # Start Gazebo client (GUI) if not headless
+    start_gazebo_client_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
+        launch_arguments={'gz_args': ['-g ']}.items(),
+        condition=IfCondition(PythonExpression(['not ', headless])))
 
     # Bridge ROS topics and Gazebo messages for establishing communication
     start_gazebo_ros_bridge_cmd = Node(
@@ -243,6 +256,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Declare the launch options
+    ld.add_action(declare_headless_cmd)
     ld.add_action(declare_robot_name_cmd)
     ld.add_action(declare_rviz_config_file_cmd)
     ld.add_action(declare_jsp_gui_cmd)
@@ -265,7 +279,8 @@ def generate_launch_description():
     ld.add_action(set_env_vars_resources)
     ld.add_action(robot_state_publisher_cmd)
     ld.add_action(load_controllers_cmd)
-    ld.add_action(start_gazebo_cmd)
+    ld.add_action(start_gazebo_server_cmd)
+    ld.add_action(start_gazebo_client_cmd)
 
     ld.add_action(start_gazebo_ros_bridge_cmd)
     ld.add_action(start_gazebo_ros_image_bridge_cmd)
