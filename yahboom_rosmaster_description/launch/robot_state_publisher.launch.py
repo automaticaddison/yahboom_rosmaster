@@ -37,6 +37,7 @@ def process_ros2_controllers_config(context):
     # Get the configuration values
     prefix = LaunchConfiguration('prefix').perform(context)
     robot_name = LaunchConfiguration('robot_name').perform(context)
+    enable_odom_tf = LaunchConfiguration('enable_odom_tf').perform(context)
 
     home = str(Path.home())
 
@@ -59,6 +60,8 @@ def process_ros2_controllers_config(context):
 
     # Create processed content (leaving template untouched)
     processed_content = template_content.replace('${prefix}', prefix)
+    processed_content = processed_content.replace(
+        'enable_odom_tf: true', f'enable_odom_tf: {enable_odom_tf}')
 
     # Write processed content to both source and install directories
     for config_path in [src_config_path, install_config_path]:
@@ -78,7 +81,10 @@ ARGUMENTS = [
                           description='Prefix for robot joints and links'),
     DeclareLaunchArgument('use_gazebo', default_value='false',
                           choices=['true', 'false'],
-                          description='Whether to use Gazebo simulation')
+                          description='Whether to use Gazebo simulation'),
+    DeclareLaunchArgument('enable_odom_tf', default_value='true',
+                          choices=['true', 'false'],
+                          description='Whether to enable odometry transform broadcasting')
 ]
 
 
