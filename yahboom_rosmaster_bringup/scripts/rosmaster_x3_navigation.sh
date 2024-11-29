@@ -27,7 +27,7 @@ ros2 launch yahboom_rosmaster_bringup rosmaster_x3_navigation_launch.py \
    world_file:=cafe.world \
    use_rviz:=true \
    use_robot_state_pub:=true \
-   use_sim_time:=false \
+   use_sim_time:=true \
    x:=0.0 \
    y:=0.0 \
    z:=0.20 \
