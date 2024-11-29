@@ -63,6 +63,7 @@ def generate_launch_description():
     gazebo_models_path = os.path.join(pkg_share_gazebo, gazebo_models_path)
 
     # Launch configuration variables
+    enable_odom_tf = LaunchConfiguration('enable_odom_tf')
     headless = LaunchConfiguration('headless')
     jsp_gui = LaunchConfiguration('jsp_gui')
     load_controllers = LaunchConfiguration('load_controllers')
@@ -89,6 +90,12 @@ def generate_launch_description():
     yaw = LaunchConfiguration('yaw')
 
     # Declare the launch arguments
+    declare_enable_odom_tf_cmd = DeclareLaunchArgument(
+        name='enable_odom_tf',
+        default_value='true',
+        choices=['true', 'false'],
+        description='Whether to enable odometry transform broadcasting via ROS 2 Control')
+
     declare_headless_cmd = DeclareLaunchArgument(
         name='headless',
         default_value='False',
@@ -177,6 +184,7 @@ def generate_launch_description():
             os.path.join(pkg_share_description, 'launch', 'robot_state_publisher.launch.py')
         ]),
         launch_arguments={
+            'enable_odom_tf': enable_odom_tf,
             'jsp_gui': jsp_gui,
             'rviz_config_file': rviz_config_file,
             'use_rviz': use_rviz,
@@ -256,6 +264,7 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Declare the launch options
+    ld.add_action(declare_enable_odom_tf_cmd)
     ld.add_action(declare_headless_cmd)
     ld.add_action(declare_robot_name_cmd)
     ld.add_action(declare_rviz_config_file_cmd)

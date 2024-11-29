@@ -84,7 +84,7 @@ ARGUMENTS = [
                           description='Whether to use Gazebo simulation'),
     DeclareLaunchArgument('enable_odom_tf', default_value='true',
                           choices=['true', 'false'],
-                          description='Whether to enable odometry transform broadcasting')
+                          description='Enable odometry transform broadcasting via ROS 2 Control')
 ]
 
 

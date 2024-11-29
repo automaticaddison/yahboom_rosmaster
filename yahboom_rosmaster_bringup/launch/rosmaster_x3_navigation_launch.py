@@ -46,6 +46,7 @@ def generate_launch_description():
 
     # Launch configuration variables
     # Config and launch files
+    enable_odom_tf = LaunchConfiguration('enable_odom_tf')
     ekf_config_file = LaunchConfiguration('ekf_config_file')
     ekf_launch_file = LaunchConfiguration('ekf_launch_file')
     gazebo_launch_file = LaunchConfiguration('gazebo_launch_file')
@@ -83,6 +84,12 @@ def generate_launch_description():
         name='ekf_launch_file',
         default_value=default_ekf_launch_path,
         description='Full path to the EKF launch file to use')
+
+    declare_enable_odom_tf_cmd = DeclareLaunchArgument(
+        name='enable_odom_tf',
+        default_value='true',
+        choices=['true', 'false'],
+        description='Whether to enable odometry transform broadcasting via ROS 2 Control')
 
     declare_gazebo_launch_file_cmd = DeclareLaunchArgument(
         name='gazebo_launch_file',
@@ -178,6 +185,7 @@ def generate_launch_description():
     start_gazebo_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gazebo_launch_file]),
         launch_arguments={
+            'enable_odom_tf': enable_odom_tf,
             'headless': headless,
             'jsp_gui': jsp_gui,
             'load_controllers': load_controllers,
@@ -211,6 +219,7 @@ def generate_launch_description():
 
     # Add all launch arguments
     # Config and launch files
+    ld.add_action(declare_enable_odom_tf_cmd)
     ld.add_action(declare_ekf_config_file_cmd)
     ld.add_action(declare_ekf_launch_file_cmd)
     ld.add_action(declare_gazebo_launch_file_cmd)
