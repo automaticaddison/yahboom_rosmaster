@@ -209,8 +209,7 @@ def generate_launch_description():
     start_ekf_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([ekf_launch_file]),
         launch_arguments={
-            'ekf_config_file': ekf_config_file,
-            'use_sim_time': use_sim_time
+            'ekf_config_file': ekf_config_file
         }.items()
     )
 
