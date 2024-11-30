@@ -197,7 +197,7 @@ global_costmap:
       publish_frequency: 5.0
       global_frame: map
       robot_base_frame: base_link
-      robot_radius: 0.15  # Based on half of the robot's width (300mm / 2 = 150mm)
+      robot_radius: 0.15  # Robot width is 300mm
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer",  "voxel_layer", "inflation_layer"]
