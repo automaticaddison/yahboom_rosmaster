@@ -5,7 +5,7 @@ Launch Nav2 for the Yahboom ROSMASTER X3 robot in Gazebo.
 This launch file sets up a complete ROS 2 navigation environment.
 
 :author: Addison Sears-Collins
-:date: November 29, 2024
+:date: November 30, 2024
 """
 
 import os
@@ -24,19 +24,24 @@ def generate_launch_description():
         LaunchDescription: A complete launch description for the robot.
     """
     # Constants for paths to different packages
+    package_name_description = 'yahboom_rosmaster_description'
     package_name_gazebo = 'yahboom_rosmaster_gazebo'
     package_name_localization = 'yahboom_rosmaster_localization'
+    package_name_navigation = 'yahboom_rosmaster_navigation'
 
     # Launch and config file paths
     gazebo_launch_file_path = 'launch/yahboom_rosmaster.gazebo.launch.py'
     ekf_launch_file_path = 'launch/ekf_gazebo.launch.py'
     ekf_config_file_path = 'config/ekf.yaml'
-    rviz_config_file_path = 'rviz/yahboom_rosmaster_gazebo_sim.rviz'
+    nav2_params_path = 'config/rosmaster_x3_nav2_default_params.yaml'
+    rviz_config_file_path = 'rviz/nav2_default_view.rviz'
 
     # Set the path to different packages
     pkg_share_gazebo = FindPackageShare(package=package_name_gazebo).find(package_name_gazebo)
     pkg_share_localization = FindPackageShare(
         package=package_name_localization).find(package_name_localization)
+    pkg_share_navigation = FindPackageShare(
+        package=package_name_navigation).find(package_name_navigation)
 
     # Set default paths
     default_gazebo_launch_path = os.path.join(pkg_share_gazebo, gazebo_launch_file_path)
