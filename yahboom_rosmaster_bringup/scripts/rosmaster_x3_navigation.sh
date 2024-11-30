@@ -41,8 +41,8 @@ ros2 launch yahboom_rosmaster_bringup rosmaster_x3_navigation_launch.py \
    roll:=0.0 \
    pitch:=0.0 \
    yaw:=0.0 \
-   "$SLAM_ARG" & #\
-   #map:=/home/ubuntu/ros2_ws/src/yahboom_rosmaster/yahboom_rosmaster_navigation/maps/cafe_world_map.yaml &
+   "$SLAM_ARG" \
+   map:=/home/ubuntu/ros2_ws/src/yahboom_rosmaster/yahboom_rosmaster_navigation/maps/cafe_world_map.yaml &
 
 echo "Waiting 25 seconds for simulation to initialize..."
 sleep 25
