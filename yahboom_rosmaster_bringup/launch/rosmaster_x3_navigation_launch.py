@@ -24,7 +24,6 @@ def generate_launch_description():
         LaunchDescription: A complete launch description for the robot.
     """
     # Constants for paths to different packages
-    package_name_description = 'yahboom_rosmaster_description'
     package_name_gazebo = 'yahboom_rosmaster_gazebo'
     package_name_localization = 'yahboom_rosmaster_localization'
     package_name_navigation = 'yahboom_rosmaster_navigation'
@@ -33,6 +32,7 @@ def generate_launch_description():
     gazebo_launch_file_path = 'launch/yahboom_rosmaster.gazebo.launch.py'
     ekf_launch_file_path = 'launch/ekf_gazebo.launch.py'
     ekf_config_file_path = 'config/ekf.yaml'
+    map_file_path = 'maps/cafe_world_map.yaml'
     nav2_params_path = 'config/rosmaster_x3_nav2_default_params.yaml'
     rviz_config_file_path = 'rviz/nav2_default_view.rviz'
 
@@ -47,15 +47,28 @@ def generate_launch_description():
     default_gazebo_launch_path = os.path.join(pkg_share_gazebo, gazebo_launch_file_path)
     default_ekf_launch_path = os.path.join(pkg_share_localization, ekf_launch_file_path)
     default_ekf_config_path = os.path.join(pkg_share_localization, ekf_config_file_path)
-    default_rviz_config_path = os.path.join(pkg_share_gazebo, rviz_config_file_path)
+    default_rviz_config_path = os.path.join(pkg_share_navigation, rviz_config_file_path)
+
+    nav2_dir = FindPackageShare(package='nav2_bringup').find('nav2_bringup')
+    nav2_launch_dir = os.path.join(nav2_dir, 'launch')
+    nav2_params_path = os.path.join(pkg_share_navigation, nav2_params_path)
+    static_map_path = os.path.join(pkg_share_navigation, map_file_path)
 
     # Launch configuration variables
     # Config and launch files
+    autostart = LaunchConfiguration('autostart')
     enable_odom_tf = LaunchConfiguration('enable_odom_tf')
     ekf_config_file = LaunchConfiguration('ekf_config_file')
     ekf_launch_file = LaunchConfiguration('ekf_launch_file')
     gazebo_launch_file = LaunchConfiguration('gazebo_launch_file')
+    map_yaml_file = LaunchConfiguration('map')
+    namespace = LaunchConfiguration('namespace')
+    nav2_params_file = LaunchConfiguration('nav2_params_file')
     rviz_config_file = LaunchConfiguration('rviz_config_file')
+    slam = LaunchConfiguration('slam')
+    use_composition = LaunchConfiguration('use_composition')
+    use_namespace = LaunchConfiguration('use_namespace')
+    use_respawn = LaunchConfiguration('use_respawn')
 
     # Robot configuration
     robot_name = LaunchConfiguration('robot_name')
@@ -69,7 +82,7 @@ def generate_launch_description():
     pitch = LaunchConfiguration('pitch')
     yaw = LaunchConfiguration('yaw')
 
-    # Feature flags
+    # Feature flags related to Gazebo and the robot description
     headless = LaunchConfiguration('headless')
     jsp_gui = LaunchConfiguration('jsp_gui')
     load_controllers = LaunchConfiguration('load_controllers')
@@ -80,6 +93,11 @@ def generate_launch_description():
 
     # Declare all launch arguments
     # Config and launch files
+    declare_autostart_cmd = DeclareLaunchArgument(
+        name='autostart',
+        default_value='true',
+        description='Automatically startup the Nav2 stack')
+
     declare_ekf_config_file_cmd = DeclareLaunchArgument(
         name='ekf_config_file',
         default_value=default_ekf_config_path,
@@ -101,6 +119,21 @@ def generate_launch_description():
         default_value=default_gazebo_launch_path,
         description='Full path to the Gazebo launch file to use')
 
+    declare_map_yaml_cmd = DeclareLaunchArgument(
+        name='map',
+        default_value=static_map_path,
+        description='Full path to map file to load')
+
+    declare_namespace_cmd = DeclareLaunchArgument(
+        name='namespace',
+        default_value='',
+        description='Top-level namespace')
+
+    declare_nav2_params_file_cmd = DeclareLaunchArgument(
+        name='nav2_params_file',
+        default_value=nav2_params_path,
+        description='Full path to the ROS2 parameters file to use for navigation nodes')
+
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
         name='rviz_config_file',
         default_value=default_rviz_config_path,
@@ -111,6 +144,11 @@ def generate_launch_description():
         name='robot_name',
         default_value='rosmaster_x3',
         description='The name for the robot')
+
+    declare_slam_cmd = DeclareLaunchArgument(
+        name='slam',
+        default_value='False',
+        description='Whether to run SLAM')
 
     declare_world_cmd = DeclareLaunchArgument(
         name='world_file',
@@ -164,6 +202,16 @@ def generate_launch_description():
         name='load_controllers',
         default_value='true',
         description='Flag to enable loading of ROS 2 controllers')
+
+    declare_use_composition_cmd = DeclareLaunchArgument(
+        name='use_composition',
+        default_value='True',
+        description='Whether to use composed bringup')
+
+    declare_use_respawn_cmd = DeclareLaunchArgument(
+        name='use_respawn',
+        default_value='False',
+        description='Whether to respawn if a node crashes. Applied when composition is disabled.')
 
     declare_use_gazebo_cmd = DeclareLaunchArgument(
         name='use_gazebo',
@@ -219,16 +267,39 @@ def generate_launch_description():
         }.items()
     )
 
+    # Launch the ROS 2 Navigation Stack
+    start_ros2_navigation_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(nav2_launch_dir, 'bringup_launch.py')),
+        launch_arguments={
+            'namespace': namespace,
+            'use_namespace': use_namespace,
+            'slam': slam,
+            'map': map_yaml_file,
+            'use_sim_time': use_sim_time,
+            'params_file': nav2_params_file,
+            'autostart': autostart,
+            'use_composition': use_composition,
+            'use_respawn': use_respawn,
+        }.items()
+    )
+
     # Create the launch description and populate
     ld = LaunchDescription()
 
     # Add all launch arguments
     # Config and launch files
+    ld.add_action(declare_autostart_cmd)
     ld.add_action(declare_enable_odom_tf_cmd)
     ld.add_action(declare_ekf_config_file_cmd)
     ld.add_action(declare_ekf_launch_file_cmd)
     ld.add_action(declare_gazebo_launch_file_cmd)
+    ld.add_action(declare_map_yaml_cmd)
+    ld.add_action(declare_namespace_cmd)
+    ld.add_action(declare_nav2_params_file_cmd)
     ld.add_action(declare_rviz_config_file_cmd)
+    ld.add_action(declare_slam_cmd)
+    ld.add_action(declare_use_composition_cmd)
+    ld.add_action(declare_use_respawn_cmd)
 
     # Robot configuration
     ld.add_action(declare_robot_name_cmd)
@@ -256,5 +327,6 @@ def generate_launch_description():
     # Add any actions
     ld.add_action(start_ekf_cmd)
     ld.add_action(start_gazebo_cmd)
+    ld.add_action(start_ros2_navigation_cmd)
 
     return ld
