@@ -15,6 +15,13 @@ cleanup() {
 # Set up cleanup trap
 trap 'cleanup' SIGINT
 
+# Check if SLAM argument is provided
+if [ "$1" = "slam" ]; then
+    SLAM_ARG="slam:=true"
+else
+    SLAM_ARG="slam:=false"
+fi
+
 # For cafe.world -> z:=0.20
 # For house.world -> z:=0.05
 # To change Gazebo camera pose: gz service -s /gui/move_to/pose --reqtype gz.msgs.GUICamera --reptype gz.msgs.Boolean --timeout 2000 --req "pose: {position: {x: 0.0, y: -2.0, z: 2.0} orientation: {x: -0.2706, y: 0.2706, z: 0.6533, w: 0.6533}}"
@@ -33,7 +40,9 @@ ros2 launch yahboom_rosmaster_bringup rosmaster_x3_navigation_launch.py \
    z:=0.20 \
    roll:=0.0 \
    pitch:=0.0 \
-   yaw:=0.0 &
+   yaw:=0.0 \
+   "$SLAM_ARG" & #\
+   #map:=/home/ubuntu/ros2_ws/src/yahboom_rosmaster/yahboom_rosmaster_navigation/maps/cafe_world_map.yaml &
 
 echo "Waiting 25 seconds for simulation to initialize..."
 sleep 25

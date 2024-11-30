@@ -12,11 +12,9 @@ find_package(nav2_bringup REQUIRED)
 find_package(slam_toolbox REQUIRED)
 
 install (
-  DIRECTORY rviz
+  DIRECTORY config maps rviz
   DESTINATION share/${PROJECT_NAME}
 )
-
-
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
