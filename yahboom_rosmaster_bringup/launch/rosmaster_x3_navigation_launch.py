@@ -150,6 +150,11 @@ def generate_launch_description():
         default_value='False',
         description='Whether to run SLAM')
 
+    declare_use_namespace_cmd = DeclareLaunchArgument(
+        name='use_namespace',
+        default_value='false',
+        description='Whether to apply a namespace to the navigation stack')
+
     declare_world_cmd = DeclareLaunchArgument(
         name='world_file',
         default_value='empty.world',
@@ -299,6 +304,7 @@ def generate_launch_description():
     ld.add_action(declare_rviz_config_file_cmd)
     ld.add_action(declare_slam_cmd)
     ld.add_action(declare_use_composition_cmd)
+    ld.add_action(declare_use_namespace_cmd)
     ld.add_action(declare_use_respawn_cmd)
 
     # Robot configuration
