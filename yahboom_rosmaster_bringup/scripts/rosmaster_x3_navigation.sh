@@ -17,9 +17,9 @@ trap 'cleanup' SIGINT
 
 # Check if SLAM argument is provided
 if [ "$1" = "slam" ]; then
-    SLAM_ARG="slam:=true"
+    SLAM_ARG="slam:=True"
 else
-    SLAM_ARG="slam:=false"
+    SLAM_ARG="slam:=False"
 fi
 
 # For cafe.world -> z:=0.20
