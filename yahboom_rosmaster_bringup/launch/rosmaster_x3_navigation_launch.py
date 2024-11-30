@@ -13,6 +13,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
@@ -239,6 +240,25 @@ def generate_launch_description():
         description='Use simulation (Gazebo) clock if true')
 
     # Specify the actions
+
+    # Start the node that relays /cmd_vel to /mecanum_drive_controller/cmd_vel
+    start_cmd_vel_relay_cmd = Node(
+        package='yahboom_rosmaster_navigation',
+        executable='cmd_vel_relay',
+        name='cmd_vel_relay',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
+    # Start Extended Kalman Filter node from the robot_localization ROS 2 package
+    start_ekf_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([ekf_launch_file]),
+        launch_arguments={
+            'ekf_config_file': ekf_config_file,
+            'use_sim_time': use_sim_time
+        }.items()
+    )
+
     # Start Gazebo
     start_gazebo_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([gazebo_launch_file]),
@@ -260,15 +280,6 @@ def generate_launch_description():
             'roll': roll,
             'pitch': pitch,
             'yaw': yaw
-        }.items()
-    )
-
-    # Start EKF
-    start_ekf_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ekf_launch_file]),
-        launch_arguments={
-            'ekf_config_file': ekf_config_file,
-            'use_sim_time': use_sim_time
         }.items()
     )
 
@@ -331,6 +342,7 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
 
     # Add any actions
+    ld.add_action(start_cmd_vel_relay_cmd)
     ld.add_action(start_ekf_cmd)
     ld.add_action(start_gazebo_cmd)
     ld.add_action(start_ros2_navigation_cmd)

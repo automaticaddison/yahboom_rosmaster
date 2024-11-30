@@ -9,6 +9,8 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
   <depend>navigation2</depend>
   <depend>nav2_bringup</depend>
   <depend>nav2_simple_commander</depend>
