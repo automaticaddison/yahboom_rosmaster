@@ -37,7 +37,6 @@ ros2 launch yahboom_rosmaster_bringup rosmaster_x3_navigation_launch.py \
 
 echo "Waiting 25 seconds for simulation to initialize..."
 sleep 25
-
 echo "Adjusting camera position..."
 gz service -s /gui/move_to/pose --reqtype gz.msgs.GUICamera --reptype gz.msgs.Boolean --timeout 2000 --req "pose: {position: {x: 0.0, y: -2.0, z: 2.0} orientation: {x: -0.2706, y: 0.2706, z: 0.6533, w: 0.6533}}"
 

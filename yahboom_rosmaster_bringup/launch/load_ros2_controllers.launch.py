@@ -41,10 +41,9 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Add delay to joint state broadcaster
-    # Default is 20.0
+    # Add delay to joint state broadcaster (if necessary)
     delayed_start = TimerAction(
-        period=20.0,
+        period=0.0,
         actions=[start_joint_state_broadcaster_cmd]
     )
 
