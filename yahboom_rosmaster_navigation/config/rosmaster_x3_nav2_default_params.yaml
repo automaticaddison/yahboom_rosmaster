@@ -184,15 +184,16 @@ controller_server:
         enabled: true
         cost_power: 1
         cost_weight: 10.0
-      # ObstaclesCritic:
-      #   enabled: true
-      #   cost_power: 1
-      #   repulsion_weight: 1.5
-      #   critical_weight: 20.0
-      #   consider_footprint: false
-      #   collision_cost: 10000.0
-      #   collision_margin_distance: 0.1
-      #   near_goal_distance: 0.5
+      # Option to replace Cost and use Obstacles instead
+      #ObstaclesCritic:
+      #  enabled: true
+      #  cost_power: 1
+      #  repulsion_weight: 1.5
+      #  critical_weight: 20.0
+      #  consider_footprint: false
+      #  collision_cost: 10000.0
+      #  collision_margin_distance: 0.05
+      #  near_goal_distance: 0.5
       # VelocityDeadbandCritic:
       #   enabled: true
       #   cost_power: 1
