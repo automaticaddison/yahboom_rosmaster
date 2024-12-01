@@ -211,7 +211,7 @@ def generate_launch_description():
 
     declare_use_composition_cmd = DeclareLaunchArgument(
         name='use_composition',
-        default_value='False',
+        default_value='True',
         description='Whether to use composed bringup')
 
     declare_use_respawn_cmd = DeclareLaunchArgument(
