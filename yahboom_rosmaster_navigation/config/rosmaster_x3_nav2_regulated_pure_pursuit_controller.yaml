@@ -104,6 +104,8 @@ controller_server:
       rotate_to_heading_angular_vel: 0.375
       max_angular_accel: 3.2
       simulate_ahead_time: 1.0
+      rotate_to_goal_heading: false
+      rotate_to_heading_once: false
       # Regulated Pure Pursuit
       desired_linear_vel: 0.4
       lookahead_dist: 0.7 # not being used when use_velocity_scaled_lookahead_dist: true

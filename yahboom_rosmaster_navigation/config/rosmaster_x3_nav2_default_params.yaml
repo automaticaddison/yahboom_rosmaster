@@ -98,13 +98,15 @@ controller_server:
       yaw_goal_tolerance: 0.50
     FollowPath:
       plugin: "nav2_rotation_shim_controller::RotationShimController"
-      primary_controller: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+      primary_controller: "nav2_mppi_controller::MPPIController"
       angular_dist_threshold: 0.50
       forward_sampling_distance: 0.60
       rotate_to_heading_angular_vel: 0.375
       max_angular_accel: 3.2
       simulate_ahead_time: 1.0
-      # Regulated Pure Pursuit
+      rotate_to_goal_heading: false
+      rotate_to_heading_once: false
+      # Model Predictive Path Integral Controller
       desired_linear_vel: 0.4
       lookahead_dist: 0.7 # not being used when use_velocity_scaled_lookahead_dist: true
       min_lookahead_dist: 0.5 # Can go lower than 0.5
