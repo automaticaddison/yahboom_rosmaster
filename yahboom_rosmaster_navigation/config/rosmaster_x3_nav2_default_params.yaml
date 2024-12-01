@@ -106,7 +106,7 @@ controller_server:
       vy_std: 0.2
       wz_std: 0.4
       vx_max: 0.5 # These acceleration and velocity parameters are where you should start tuning
-      vx_min: -0.35
+      vx_min: 0.0 # -0.35 is default
       vy_max: 0.5
       wz_max: 1.9
       ax_max: 3.0
