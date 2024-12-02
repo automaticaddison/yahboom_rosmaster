@@ -158,7 +158,7 @@ def generate_launch_description():
 
     declare_world_cmd = DeclareLaunchArgument(
         name='world_file',
-        default_value='empty.world',
+        default_value='cafe.world',
         description='World file name (e.g., empty.world, house.world)')
 
     # Position arguments
@@ -174,7 +174,7 @@ def generate_launch_description():
 
     declare_z_cmd = DeclareLaunchArgument(
         name='z',
-        default_value='0.05',
+        default_value='0.20',
         description='z component of initial position, meters')
 
     # Orientation arguments
