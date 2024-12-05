@@ -51,6 +51,7 @@ class GoalPublisher(Node):
         msg = PoseStamped()
         header = Header()
         header.frame_id = 'map'
+
         # Get current ROS time and convert to Time message
         now = self.get_clock().now()
         header.stamp = Time(
