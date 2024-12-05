@@ -7,14 +7,14 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(navigation2 REQUIRED)
 find_package(nav2_bringup REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(slam_toolbox REQUIRED)
-
-install (
-  DIRECTORY config maps rviz
-  DESTINATION share/${PROJECT_NAME}
-)
+find_package(std_msgs REQUIRED)
 
 add_executable(cmd_vel_relay src/cmd_vel_relay_node.cpp)
 ament_target_dependencies(cmd_vel_relay
@@ -24,6 +24,21 @@ ament_target_dependencies(cmd_vel_relay
 
 install(TARGETS
   cmd_vel_relay
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
+install (
+  DIRECTORY config maps rviz scripts yahboom_rosmaster_navigation
+  DESTINATION share/${PROJECT_NAME}
+)
+
+# Install Python modules
+ament_python_install_package(${PROJECT_NAME})
+
+# Install Python executables
+install(PROGRAMS
+  ${PROJECT_NAME}/posestamped_msg_generator.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
