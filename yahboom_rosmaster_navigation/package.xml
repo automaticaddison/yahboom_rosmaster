@@ -19,6 +19,8 @@
   <depend>nav2_simple_commander</depend>
   <depend>slam_toolbox</depend>
   <depend>std_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf_transformations</depend>
 
 
   <test_depend>ament_lint_auto</test_depend>

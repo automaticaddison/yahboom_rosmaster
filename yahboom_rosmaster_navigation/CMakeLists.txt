@@ -15,6 +15,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(slam_toolbox REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(tf2_ros REQUIRED)
 
 add_executable(cmd_vel_relay src/cmd_vel_relay_node.cpp)
 ament_target_dependencies(cmd_vel_relay
@@ -27,9 +28,8 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-
 install (
-  DIRECTORY config maps rviz scripts yahboom_rosmaster_navigation
+  DIRECTORY config maps rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -37,10 +37,11 @@ install (
 ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
-install(PROGRAMS
-  ${PROJECT_NAME}/posestamped_msg_generator.py
-  DESTINATION lib/${PROJECT_NAME}
-)
+#install(PROGRAMS
+#  scripts/go_to_predefined_goal_pose.py
+#  scripts/assisted_teleop_node.py
+#  DESTINATION lib/${PROJECT_NAME}
+#)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
