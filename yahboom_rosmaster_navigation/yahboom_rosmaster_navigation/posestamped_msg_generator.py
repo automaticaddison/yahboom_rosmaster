@@ -11,9 +11,9 @@ message with header information and pose data.
 """
 
 from rclpy.node import Node
+from builtin_interfaces.msg import Time
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion
 from std_msgs.msg import Header
-from builtin_interfaces.msg import Time
 
 
 class PoseStampedGenerator(Node):
