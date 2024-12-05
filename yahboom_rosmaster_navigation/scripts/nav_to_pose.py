@@ -36,6 +36,8 @@ STOP_NAVIGATION_NOW = False
 NAV_IN_PROGRESS = False
 MOVING_FORWARD = True
 
+COSTMAP_CLEARING_PERIOD = 0.5
+
 
 class GoToGoalPose(Node):
     """This class subscribes to the goal pose and publishes the ETA
@@ -65,7 +67,7 @@ class GoToGoalPose(Node):
         self.dt = (self.current_time - self.last_time) * 1e-9
 
         # Clear the costmap every X.X seconds when the robot is not making forward progress
-        self.costmap_clearing_period = 0.5
+        self.costmap_clearing_period = COSTMAP_CLEARING_PERIOD
 
         # Launch the ROS 2 Navigation Stack
         self.navigator = BasicNavigator()
