@@ -295,7 +295,6 @@ def generate_launch_description():
     start_nav_to_pose_cmd = Node(
         package='yahboom_rosmaster_navigation',
         executable='nav_to_pose.py',
-        name='nav_to_pose',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}]
     )
@@ -359,7 +358,7 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
 
     # Add any actions
-    ld.add_action(start_assisted_teleop_cmd)
+    # ld.add_action(start_assisted_teleop_cmd)
     ld.add_action(start_cmd_vel_relay_cmd)
     ld.add_action(start_ekf_cmd)
     ld.add_action(start_gazebo_cmd)
