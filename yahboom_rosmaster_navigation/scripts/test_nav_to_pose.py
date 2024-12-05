@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 """
 ROS 2 node for publishing a single goal pose.
 This script creates a ROS 2 node that publishes a single goal pose to the
@@ -11,7 +10,6 @@ Publishing Topics:
 :author: Addison Sears-Collins
 :date: December 5, 2024
 """
-
 import rclpy
 from rclpy.node import Node
 from builtin_interfaces.msg import Time
@@ -43,7 +41,6 @@ class GoalPublisher(Node):
         publishes it, and then shuts down the node.
         """
         msg = PoseStamped()
-
         header = Header()
         header.frame_id = 'map'
 
@@ -79,7 +76,7 @@ class GoalPublisher(Node):
         self.publisher.publish(msg)
         self.get_logger().info('Goal pose published')
 
-        # Cancel the timer and indicate shutdown, but don't call rclpy.shutdown()
+        # Cancel the timer and indicate shutdown
         self.timer.cancel()
         self.get_logger().info('Goal Publisher node is shutting down')
 

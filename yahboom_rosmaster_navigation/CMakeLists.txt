@@ -40,7 +40,6 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   scripts/assisted_teleoperation.py
   scripts/nav_to_pose.py
-  scripts/nav_to_predefined_goal_pose.py
   scripts/test_nav_to_pose.py
   DESTINATION lib/${PROJECT_NAME}
 )

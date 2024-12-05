@@ -3,54 +3,42 @@
 ROS 2 node for navigating to predefined table locations.
 
 This script creates a ROS 2 node that:
-    - Allows user to select a predefined table location
-    - Navigates the robot to the selected table
-    - Publishes the estimated time of arrival
-    - Publishes the goal status
-    - Cancels the goal if a stop signal is received
+   - Allows user to select a predefined table location
+   - Navigates the robot to the selected table
+   - Publishes the estimated time of arrival
+   - Publishes the goal status
+   - Cancels the goal if a stop signal is received
 
 Subscription Topics:
-    /stop/navigation/go_to_predefined_goal_pose (std_msgs/Bool): Signal to stop navigation
-    /cmd_vel (geometry_msgs/Twist): Velocity command
+   /stop/navigation/go_to_predefined_goal_pose (std_msgs/Bool): Signal to stop navigation
+   /cmd_vel (geometry_msgs/Twist): Velocity command
 
 Publishing Topics:
-    /goal_pose/eta (std_msgs/String): Estimated time of arrival in seconds
-    /goal_pose/status (std_msgs/String): Goal pose status
+   /goal_pose/eta (std_msgs/String): Estimated time of arrival in seconds
+   /goal_pose/status (std_msgs/String): Goal pose status
 
 :author: Addison Sears-Collins
 :date: December 5, 2024
 """
 
 import time
-
+import threading
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
+from rclpy.executors import MultiThreadedExecutor
 from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 from std_msgs.msg import Bool, String
 from geometry_msgs.msg import Twist
 from tf_transformations import quaternion_from_euler
 
-
 # Import our custom PoseStamped generator
 from yahboom_rosmaster_navigation.posestamped_msg_generator import PoseStampedGenerator
 
-# Constants
-COSTMAP_CLEARING_PERIOD = 0.5
-NAVIGATION_LOOP_DELAY = 0.1
-
-
-class NavigationState:
-    """Encapsulates the global state of navigation."""
-
-    def __init__(self):
-        self.stop_requested = False
-        self.in_progress = False
-        self.moving_forward = True
-
-
-# Global navigation state
-nav_state = NavigationState()
+# Global flags for navigation state
+STOP_NAVIGATION_NOW = False
+NAV_IN_PROGRESS = False
+MOVING_FORWARD = True
 
 
 class GoToPredefinedGoalPose(Node):
@@ -67,21 +55,15 @@ class GoToPredefinedGoalPose(Node):
         self.publisher_eta = self.create_publisher(String, '/goal_pose/eta', 10)
         self.publisher_status = self.create_publisher(String, '/goal_pose/status', 10)
 
-        # Subscribers
-        self.subscription_stop_navigation = self.create_subscription(
-            Bool,
-            '/stop/navigation/go_to_predefined_goal_pose',
-            self.set_stop_navigation,
-            10)
+        # Keep track of time for clearing the costmaps
+        self.current_time = self.get_clock().now().nanoseconds
+        self.last_time = self.current_time
+        self.dt = (self.current_time - self.last_time) * 1e-9
 
-        self.subscription_current_velocity = self.create_subscription(
-            Twist,
-            '/cmd_vel',
-            self.get_current_velocity,
-            1)
+        # Clear the costmap every 0.5 seconds when the robot is not making forward progress
+        self.costmap_clearing_period = 0.5
 
         # Initialize navigation
-        self.last_costmap_clear_time = self.get_clock().now()
         self.navigator = BasicNavigator()
         self.navigator.waitUntilNav2Active()
 
@@ -103,115 +85,168 @@ class GoToPredefinedGoalPose(Node):
             frame_id='map'
         )
 
-    def set_stop_navigation(self, msg):
-        """Handle stop navigation requests."""
-        if nav_state.in_progress and msg.data:
-            nav_state.stop_requested = True
-            self.get_logger().info('Navigation cancellation request received.')
-
-    def get_current_velocity(self, msg):
-        """Monitor robot's forward progress."""
-        nav_state.moving_forward = msg.linear.x > 0.0
-
     def go_to_goal_pose(self, table_name):
         """Navigate to a specific table location."""
+        global NAV_IN_PROGRESS, STOP_NAVIGATION_NOW
 
         # Get table coordinates and create goal pose
         loc = self.locations[table_name]
         goal_pose = self.create_goal_pose(loc[0], loc[1], loc[2])
 
-        # Start navigation
+        # Clear all costmaps before sending to a goal
         self.navigator.clearAllCostmaps()
         self.navigator.goToPose(goal_pose)
 
-        # Navigation loop
+        # As long as the robot is moving to the goal pose
         while rclpy.ok() and not self.navigator.isTaskComplete():
             feedback = self.navigator.getFeedback()
+
             if feedback:
-                # Calculate and publish ETA
-                eta = f"{
-                    Duration.from_msg(
-                        feedback.estimated_time_remaining).nanoseconds /
-                    1e9:.0f}"
+                # Publish the estimated time of arrival in seconds
+                estimated_time_of_arrival = f"{Duration.from_msg(
+                    feedback.estimated_time_remaining).nanoseconds / 1e9:.0f}"
                 msg_eta = String()
-                msg_eta.data = eta
+                msg_eta.data = str(estimated_time_of_arrival)
                 self.publisher_eta.publish(msg_eta)
 
-                # Publish status
+                # Publish the goal status
                 msg_status = String()
                 msg_status.data = "IN_PROGRESS"
                 self.publisher_status.publish(msg_status)
-                nav_state.in_progress = True
+                NAV_IN_PROGRESS = True
 
-                # Clear costmaps if needed
-                current_time = self.get_clock().now()
-                time_difference = (current_time - self.last_costmap_clear_time).nanoseconds / 1e9
-                if (not nav_state.moving_forward and
-                        time_difference > COSTMAP_CLEARING_PERIOD):
+                # Clear the costmap at the desired frequency
+                self.current_time = self.get_clock().now().nanoseconds
+                self.dt = (self.current_time - self.last_time) * 1e-9
+
+                if not MOVING_FORWARD and self.dt > self.costmap_clearing_period:
                     self.navigator.clearAllCostmaps()
-                    self.last_costmap_clear_time = current_time
+                    self.last_time = self.current_time
 
-            # Check for stop request
-            if nav_state.stop_requested:
+            # Stop the robot if necessary
+            if STOP_NAVIGATION_NOW:
                 self.navigator.cancelTask()
-                self.get_logger().info('Navigation cancelled.')
-                break
+                self.get_logger().info('Navigation cancellation request fulfilled...')
 
-            time.sleep(NAVIGATION_LOOP_DELAY)
+            time.sleep(0.1)
 
-        # Finalize navigation
-        nav_state.stop_requested = False
-        nav_state.in_progress = False
+        # Reset the variable values
+        STOP_NAVIGATION_NOW = False
+        NAV_IN_PROGRESS = False
 
-        # Get and publish final status
+        # Publish the final status
         result = self.navigator.getResult()
-        status = "SUCCEEDED" if result == TaskResult.SUCCEEDED else \
-            "CANCELED" if result == TaskResult.CANCELED else \
-            "FAILED" if result == TaskResult.FAILED else "UNKNOWN"
-
         msg_status = String()
-        msg_status.data = status
+
+        if result == TaskResult.SUCCEEDED:
+            self.get_logger().info('Successfully reached the goal!')
+            msg_status.data = "SUCCEEDED"
+        elif result == TaskResult.CANCELED:
+            self.get_logger().info('Goal was canceled!')
+            msg_status.data = "CANCELED"
+        elif result == TaskResult.FAILED:
+            self.get_logger().info('Goal failed!')
+            msg_status.data = "FAILED"
+        else:
+            self.get_logger().info('Goal has an invalid return status!')
+            msg_status.data = "INVALID"
+
         self.publisher_status.publish(msg_status)
-        self.get_logger().info(f'Navigation result: {status}')
 
-    def run(self):
-        """Main run loop for table navigation."""
-        while rclpy.ok():
-            print("\nAVAILABLE TABLES:")
-            print(*self.locations.keys(), sep="\n")
 
-            user_input = input('\nEnter table number (1-5) or "exit": ').lower().strip()
+class GetStopNavigationSignal(Node):
+    """This class subscribes to a Boolean flag that tells the robot to stop navigation."""
 
-            if user_input == 'exit':
-                break
+    def __init__(self):
+        """Constructor."""
+        super().__init__('get_stop_navigation_signal')
 
-            if user_input.isdigit() and 1 <= int(user_input) <= 5:
-                table_name = f'table_{user_input}'
-                self.go_to_goal_pose(table_name)
+        self.subscription_stop_navigation = self.create_subscription(
+            Bool,
+            '/stop/navigation/go_to_predefined_goal_pose',
+            self.set_stop_navigation,
+            10)
 
-                if nav_state.stop_requested:
-                    user_input = input(
-                        "Navigation cancelled. Press 'c' to continue or any key to exit: ")
-                    if user_input.lower() != 'c':
-                        break
-                    nav_state.stop_requested = False
-            else:
-                print("Invalid input. Please enter a number between 1 and 5.")
+    def set_stop_navigation(self, msg):
+        """Determine if the robot needs to stop."""
+        global STOP_NAVIGATION_NOW
 
-        self.navigator.lifecycleShutdown()
+        if NAV_IN_PROGRESS and msg.data:
+            STOP_NAVIGATION_NOW = msg.data
+            self.get_logger().info('Navigation cancellation request received by ROS 2...')
+
+
+class GetCurrentVelocity(Node):
+    """This class subscribes to the current velocity."""
+
+    def __init__(self):
+        """Constructor."""
+        super().__init__('get_current_velocity')
+
+        self.subscription_current_velocity = self.create_subscription(
+            Twist,
+            '/cmd_vel',
+            self.get_current_velocity,
+            1)
+
+    def get_current_velocity(self, msg):
+        """Get the current velocity."""
+        global MOVING_FORWARD
+
+        MOVING_FORWARD = msg.linear.x > 0.0
 
 
 def main(args=None):
-    """Main function."""
+    """Main function to initialize and run the ROS 2 nodes."""
     rclpy.init(args=args)
-    node = GoToPredefinedGoalPose()
 
     try:
-        node.run()
-    except KeyboardInterrupt:
-        pass
+        # Create the nodes
+        go_to_predefined_goal_pose = GoToPredefinedGoalPose()
+        get_stop_navigation_signal = GetStopNavigationSignal()
+        get_current_velocity = GetCurrentVelocity()
+
+        # Set up multithreading
+        executor = MultiThreadedExecutor()
+        executor.add_node(go_to_predefined_goal_pose)
+        executor.add_node(get_stop_navigation_signal)
+        executor.add_node(get_current_velocity)
+
+        # Start the executor in a separate thread
+        executor_thread = threading.Thread(target=executor.spin, daemon=True)
+        executor_thread.start()
+
+        try:
+            while rclpy.ok():
+                print("\nAVAILABLE TABLES:")
+                print(*go_to_predefined_goal_pose.locations.keys(), sep="\n")
+
+                user_input = input('\nEnter table number (1-5) or "exit": ').lower().strip()
+
+                if user_input == 'exit':
+                    break
+
+                if user_input.isdigit() and 1 <= int(user_input) <= 5:
+                    table_name = f'table_{user_input}'
+                    go_to_predefined_goal_pose.go_to_goal_pose(table_name)
+
+                    if STOP_NAVIGATION_NOW:
+                        user_input = input(
+                            "Navigation cancelled. Press 'c' to continue or any key to exit: ")
+                        if user_input.lower() != 'c':
+                            break
+                        STOP_NAVIGATION_NOW = False
+                else:
+                    print("Invalid input. Please enter a number between 1 and 5.")
+
+        finally:
+            # Shutdown the executor and nodes
+            executor.shutdown()
+            go_to_predefined_goal_pose.destroy_node()
+            get_stop_navigation_signal.destroy_node()
+            get_current_velocity.destroy_node()
+
     finally:
-        node.destroy_node()
         rclpy.shutdown()
 
 
