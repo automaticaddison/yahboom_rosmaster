@@ -31,207 +31,137 @@ from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 from std_msgs.msg import Bool, String
 from geometry_msgs.msg import Twist, PoseStamped
 
-
-# Constants
-COSTMAP_CLEARING_PERIOD = 0.5  # Time period for clearing costmaps (in seconds)
-NAVIGATION_LOOP_DELAY = 0.1  # Delay in navigation loop to prevent CPU overuse (in seconds)
-
-
-class NavigationState:
-    """
-    Encapsulates the global state of navigation.
-
-    :param stop_requested: Flag to indicate if navigation stop is requested
-    :param in_progress: Flag to indicate if navigation is currently in progress
-    :param moving_forward: Flag to indicate if the robot is moving forward
-    """
-
-    def __init__(self):
-        self.stop_requested = False
-        self.in_progress = False
-        self.moving_forward = True
-
-
-# Global navigation state
-nav_state = NavigationState()
+# Global flags for navigation state
+STOP_NAVIGATION_NOW = False
+NAV_IN_PROGRESS = False
+MOVING_FORWARD = True
 
 
 class GoToGoalPose(Node):
-    """
-    ROS 2 node for navigating to a goal pose and publishing status updates.
-
-    This node handles the main navigation logic, including processing
-    feedback, publishing status updates, and managing the navigation lifecycle.
+    """This class subscribes to the goal pose and publishes the ETA
+       and goal status information to ROS 2.
     """
 
     def __init__(self):
-        """
-        Initialize the GoToGoalPose node.
-
-        Sets up publishers, subscribers, and initializes the navigation system.
-        """
+        """Constructor."""
+        # Initialize the class using the constructor
         super().__init__('go_to_goal_pose')
 
-        # Set up publishers for ETA and status updates
+        # Create the ROS 2 publishers
         self.publisher_eta = self.create_publisher(String, '/goal_pose/eta', 10)
         self.publisher_status = self.create_publisher(String, '/goal_pose/status', 10)
 
-        # Set up subscriber for receiving goal poses
+        # Create a subscriber
+        # This node subscribes to messages of type geometry_msgs/PoseStamped
         self.subscription_go_to_goal_pose = self.create_subscription(
             PoseStamped,
             '/goal_pose/goal',
             self.go_to_goal_pose,
             10)
 
-        # Initialize time tracking for costmap clearing
-        self.last_costmap_clear_time = self.get_clock().now()
+        # Keep track of time for clearing the costmaps
+        self.current_time = self.get_clock().now().nanoseconds
+        self.last_time = self.current_time
+        self.dt = (self.current_time - self.last_time) * 1e-9
 
-        # Initialize the navigation system
+        # Clear the costmap every X.X seconds when the robot is not making forward progress
+        self.costmap_clearing_period = 0.5
+
+        # Launch the ROS 2 Navigation Stack
         self.navigator = BasicNavigator()
+
+        # Wait for navigation to fully activate
         self.navigator.waitUntilNav2Active()
 
     def go_to_goal_pose(self, msg):
-        """
-        Navigate to the specified goal pose.
+        """Go to goal pose."""
+        global NAV_IN_PROGRESS, STOP_NAVIGATION_NOW  # pylint: disable=global-statement
 
-        :param msg: The goal pose message
-        :type msg: geometry_msgs/PoseStamped
-        """
-        # Clear costmaps before starting navigation
+        # Clear all costmaps before sending to a goal
         self.navigator.clearAllCostmaps()
 
-        # Start navigation to the goal pose
+        # Go to the goal pose
         self.navigator.goToPose(msg)
 
-        # Main navigation loop
+        # As long as the robot is moving to the goal pose
         while rclpy.ok() and not self.navigator.isTaskComplete():
+            # Get the feedback message
             feedback = self.navigator.getFeedback()
+
             if feedback:
-                self._process_feedback(feedback)
-                self._check_costmap_clearing()
+                # Publish the estimated time of arrival in seconds
+                estimated_time_of_arrival = f"{Duration.from_msg(
+                    feedback.estimated_time_remaining).nanoseconds / 1e9:.0f}"
+                msg_eta = String()
+                msg_eta.data = str(estimated_time_of_arrival)
+                self.publisher_eta.publish(msg_eta)
 
-            # Check if navigation should be stopped
-            if nav_state.stop_requested:
+                # Publish the goal status
+                msg_status = String()
+                msg_status.data = "IN_PROGRESS"
+                self.publisher_status.publish(msg_status)
+                NAV_IN_PROGRESS = True
+
+                # Clear the costmap at the desired frequency
+                # Get the current time
+                self.current_time = self.get_clock().now().nanoseconds
+
+                # How much time has passed in seconds since the last costmap clearing
+                self.dt = (self.current_time - self.last_time) * 1e-9
+
+                # If we are making no forward progress after X seconds, clear all costmaps
+                if not MOVING_FORWARD and self.dt > self.costmap_clearing_period:
+                    self.navigator.clearAllCostmaps()
+                    self.last_time = self.current_time
+
+            # Stop the robot if necessary
+            if STOP_NAVIGATION_NOW:
                 self.navigator.cancelTask()
-                self.get_logger().info('Navigation cancellation request fulfilled.')
-                break
+                self.get_logger().info('Navigation cancellation request fulfilled...')
 
-            time.sleep(NAVIGATION_LOOP_DELAY)
+            time.sleep(0.1)
 
-        # Finalize navigation process
-        self._finalize_navigation()
+        # Reset the variable values
+        STOP_NAVIGATION_NOW = False
+        NAV_IN_PROGRESS = False
 
-    def _process_feedback(self, feedback):
-        """
-        Process and publish navigation feedback.
-
-        :param feedback: Navigation feedback from the robot
-        :type feedback: nav2_msgs.action.NavigateToPose.Feedback
-        """
-        eta = self._calculate_eta(feedback)
-        self._publish_eta(eta)
-        self._publish_status("IN_PROGRESS")
-        nav_state.in_progress = True
-
-    def _calculate_eta(self, feedback):
-        """
-        Calculate estimated time of arrival.
-
-        :param feedback: Navigation feedback from the robot
-        :type feedback: nav2_msgs.action.NavigateToPose.Feedback
-        :return: Estimated time of arrival in seconds
-        :rtype: str
-        """
-        time_remaining_seconds = Duration.from_msg(
-            feedback.estimated_time_remaining).nanoseconds / 1e9
-        return f"{time_remaining_seconds:.0f}"
-
-    def _publish_eta(self, eta):
-        """
-        Publish estimated time of arrival.
-
-        :param eta: Estimated time of arrival in seconds
-        :type eta: str
-        """
-        msg_eta = String()
-        msg_eta.data = str(eta)
-        self.publisher_eta.publish(msg_eta)
-
-    def _publish_status(self, status):
-        """
-        Publish navigation status.
-
-        :param status: Current navigation status
-        :type status: str
-        """
-        msg_status = String()
-        msg_status.data = status
-        self.publisher_status.publish(msg_status)
-
-    def _check_costmap_clearing(self):
-        """
-        Check and clear costmaps if necessary.
-
-        Clears costmaps if the robot is not moving forward and a certain time has passed.
-        This scenario could occur when a person walks in front of the robot, causing the
-        robot to stop. We want to make sure the costmap is cleared so the robot can continue
-        on its way.
-        """
-        current_time = self.get_clock().now()
-        time_difference = (current_time - self.last_costmap_clear_time).nanoseconds / 1e9
-        if (not nav_state.moving_forward and
-                time_difference > COSTMAP_CLEARING_PERIOD):
-            self.navigator.clearAllCostmaps()
-            self.last_costmap_clear_time = current_time
-
-    def _finalize_navigation(self):
-        """
-        Finalize navigation and publish result.
-
-        Resets navigation state flags and publishes the final navigation status.
-        """
-        nav_state.stop_requested = False
-        nav_state.in_progress = False
-
+        # Publish the final goal status
         result = self.navigator.getResult()
-        status = self._get_status_string(result)
-        self._publish_status(status)
-        self.get_logger().info(f'Navigation result: {status}')
+        msg_status = String()
 
-    def _get_status_string(self, result):
-        """
-        Get string representation of navigation result.
-
-        :param result: The TaskResult enum value
-        :type result: TaskResult
-        :return: String representation of the result
-        :rtype: str
-        """
         if result == TaskResult.SUCCEEDED:
-            return "SUCCEEDED"
+            self.get_logger().info('Successfully reached the goal!')
+            msg_status.data = "SUCCEEDED"
+            self.publisher_status.publish(msg_status)
+
         elif result == TaskResult.CANCELED:
-            return "CANCELED"
+            self.get_logger().info('Goal was canceled!')
+            msg_status.data = "CANCELED"
+            self.publisher_status.publish(msg_status)
+
         elif result == TaskResult.FAILED:
-            return "FAILED"
+            self.get_logger().info('Goal failed!')
+            msg_status.data = "FAILED"
+            self.publisher_status.publish(msg_status)
+
         else:
-            return "INVALID"
+            self.get_logger().info('Goal has an invalid return status!')
+            msg_status.data = "INVALID"
+            self.publisher_status.publish(msg_status)
 
 
 class GetStopNavigationSignal(Node):
-    """
-    ROS 2 node for receiving stop navigation signals.
-
-    This node listens for signals to stop the current navigation task.
+    """This class subscribes to a Boolean flag that tells the
+       robot to stop navigation.
     """
 
     def __init__(self):
-        """
-        Initialize the GetStopNavigationSignal node.
-
-        Sets up a subscriber for stop navigation signals.
-        """
+        """Constructor."""
+        # Initialize the class using the constructor
         super().__init__('get_stop_navigation_signal')
 
+        # Create a subscriber
+        # This node subscribes to messages of type std_msgs/Bool
         self.subscription_stop_navigation = self.create_subscription(
             Bool,
             '/stop/navigation/go_to_goal_pose',
@@ -239,32 +169,26 @@ class GetStopNavigationSignal(Node):
             10)
 
     def set_stop_navigation(self, msg):
-        """
-        Set the stop navigation flag based on received message.
+        """Determine if the robot needs to stop, and adjust the variable value accordingly."""
+        global STOP_NAVIGATION_NOW  # pylint: disable=global-statement
 
-        :param msg: The stop navigation message
-        :type msg: std_msgs/Bool
-        """
-        if nav_state.in_progress and msg.data:
-            nav_state.stop_requested = True
-            self.get_logger().info('Navigation cancellation request received.')
+        if NAV_IN_PROGRESS and msg.data:
+            STOP_NAVIGATION_NOW = msg.data
+            self.get_logger().info('Navigation cancellation request received by ROS 2...')
 
 
 class GetCurrentVelocity(Node):
-    """
-    ROS 2 node for monitoring current velocity.
-
-    This node listens to the robot's current velocity and updates the navigation state.
+    """This class subscribes to the current velocity and determines if the robot
+       is making forward progress.
     """
 
     def __init__(self):
-        """
-        Initialize the GetCurrentVelocity node.
-
-        Sets up a subscriber for current velocity messages.
-        """
+        """Constructor."""
+        # Initialize the class using the constructor
         super().__init__('get_current_velocity')
 
+        # Create a subscriber
+        # This node subscribes to messages of type geometry_msgs/Twist
         self.subscription_current_velocity = self.create_subscription(
             Twist,
             '/cmd_vel',
@@ -272,49 +196,46 @@ class GetCurrentVelocity(Node):
             1)
 
     def get_current_velocity(self, msg):
-        """
-        Determine if the robot is making forward progress based on current velocity.
+        """Get the current velocity, and determine if the robot is making forward progress."""
+        global MOVING_FORWARD  # pylint: disable=global-statement
 
-        :param msg: The current velocity message
-        :type msg: geometry_msgs/Twist
-        """
-        nav_state.moving_forward = msg.linear.x > 0.0
+        linear_x_value = msg.linear.x
+
+        if linear_x_value <= 0.0:
+            MOVING_FORWARD = False
+        else:
+            MOVING_FORWARD = True
 
 
 def main(args=None):
-    """
-    Main function to initialize and run the ROS 2 nodes.
-
-    :param args: Command-line arguments
-    :type args: list
-    """
-    # Initialize the ROS 2 Python client library
+    """Main function to initialize and run the ROS 2 nodes."""
+    # Initialize the rclpy library
     rclpy.init(args=args)
 
     try:
-        # Create instances of all three nodes
-        nodes = [
-            GoToGoalPose(),
-            GetStopNavigationSignal(),
-            GetCurrentVelocity()
-        ]
+        # Create the nodes
+        go_to_goal_pose = GoToGoalPose()
+        get_stop_navigation_signal = GetStopNavigationSignal()
+        get_current_velocity = GetCurrentVelocity()
 
-        # Set up multithreaded executor
+        # Set up multithreading
         executor = MultiThreadedExecutor()
-        for node in nodes:
-            executor.add_node(node)
+        executor.add_node(go_to_goal_pose)
+        executor.add_node(get_stop_navigation_signal)
+        executor.add_node(get_current_velocity)
 
         try:
             # Spin the nodes to execute the callbacks
             executor.spin()
         finally:
-            # Shutdown and destroy all nodes
+            # Shutdown the nodes
             executor.shutdown()
-            for node in nodes:
-                node.destroy_node()
+            go_to_goal_pose.destroy_node()
+            get_stop_navigation_signal.destroy_node()
+            get_current_velocity.destroy_node()
 
     finally:
-        # Shutdown the ROS 2 Python client library
+        # Shutdown the ROS client library for Python
         rclpy.shutdown()
 
 

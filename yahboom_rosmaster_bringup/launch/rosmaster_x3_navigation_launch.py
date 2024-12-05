@@ -241,6 +241,14 @@ def generate_launch_description():
 
     # Specify the actions
 
+    start_assisted_teleop_cmd = Node(
+        package='yahboom_rosmaster_navigation',
+        executable='assisted_teleoperation.py',
+        name='assisted_teleop',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
     # Start the node that relays /cmd_vel to /mecanum_drive_controller/cmd_vel
     start_cmd_vel_relay_cmd = Node(
         package='yahboom_rosmaster_navigation',
@@ -281,6 +289,15 @@ def generate_launch_description():
             'pitch': pitch,
             'yaw': yaw
         }.items()
+    )
+
+    # Start the node that receives goal poses and sends the robot there
+    start_nav_to_pose_cmd = Node(
+        package='yahboom_rosmaster_navigation',
+        executable='nav_to_pose.py',
+        name='nav_to_pose',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
     )
 
     # Launch the ROS 2 Navigation Stack
@@ -342,9 +359,11 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
 
     # Add any actions
+    # ld.add_action(start_assisted_teleop_cmd)
     ld.add_action(start_cmd_vel_relay_cmd)
     ld.add_action(start_ekf_cmd)
     ld.add_action(start_gazebo_cmd)
+    ld.add_action(start_nav_to_pose_cmd)
     ld.add_action(start_ros2_navigation_cmd)
 
     return ld
