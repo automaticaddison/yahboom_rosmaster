@@ -37,11 +37,10 @@ install (
 ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
-#install(PROGRAMS
-#  scripts/go_to_predefined_goal_pose.py
-#  scripts/assisted_teleop_node.py
-#  DESTINATION lib/${PROJECT_NAME}
-#)
+install(PROGRAMS
+  scripts/nav_to_pose.py
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
