@@ -44,7 +44,7 @@ class AssistedTeleopNode(Node):
         clear_frequency = self.get_parameter('costmap_clear_frequency').value
 
         # Initialize the BasicNavigator for interfacing with Nav2
-        self.navigator = BasicNavigator()
+        self.navigator = BasicNavigator('assisted_teleop_navigator')
 
         # Create subscribers for velocity commands and cancellation requests
         self.cmd_vel_sub = self.create_subscription(
@@ -63,6 +63,9 @@ class AssistedTeleopNode(Node):
         self.get_logger().info(
             f'Assisted Teleop Node initialized with costmap clearing frequency: {
                 clear_frequency} Hz')
+
+        # Wait for navigation to fully activate.
+        self.navigator.waitUntilNav2Active()
 
     def cmd_vel_callback(self, twist_msg: Twist) -> None:
         """Process incoming velocity commands and activate assisted teleop if needed."""
@@ -108,12 +111,6 @@ def main():
 
     try:
         node = AssistedTeleopNode()
-
-        # Wait for Nav2 stack to become active
-        if not node.navigator.waitUntilNav2Active():
-            node.get_logger().error('Nav2 failed to activate')
-            return
-
         rclpy.spin(node)
 
     except KeyboardInterrupt:
