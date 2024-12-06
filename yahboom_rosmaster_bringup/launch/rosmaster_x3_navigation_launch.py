@@ -244,7 +244,6 @@ def generate_launch_description():
     start_assisted_teleop_cmd = Node(
         package='yahboom_rosmaster_navigation',
         executable='assisted_teleoperation.py',
-        name='assisted_teleop',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}]
     )
