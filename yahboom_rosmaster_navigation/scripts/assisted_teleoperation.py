@@ -69,6 +69,12 @@ class AssistedTeleopNode(Node):
 
     def cmd_vel_callback(self, twist_msg: Twist) -> None:
         """Process incoming velocity commands and activate assisted teleop if needed."""
+        # Reset cancellation flag when new velocity commands are received
+        if (abs(twist_msg.linear.x) > 0.0 or
+            abs(twist_msg.linear.y) > 0.0 or
+                abs(twist_msg.angular.z) > 0.0):
+            self.cancellation_requested = False
+
         if not self.assisted_teleop_active and not self.cancellation_requested:
             if (abs(twist_msg.linear.x) > 0.0 or
                 abs(twist_msg.linear.y) > 0.0 or
