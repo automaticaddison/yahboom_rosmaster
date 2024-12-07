@@ -11,6 +11,7 @@
 
   <exec_depend>yahboom_rosmaster_bringup</exec_depend>
   <exec_depend>yahboom_rosmaster_description</exec_depend>
+  <exec_depend>yahboom_rosmaster_docking</exec_depend>
   <exec_depend>yahboom_rosmaster_gazebo</exec_depend>
   <exec_depend>yahboom_rosmaster_localization</exec_depend>
   <exec_depend>yahboom_rosmaster_navigation</exec_depend>
