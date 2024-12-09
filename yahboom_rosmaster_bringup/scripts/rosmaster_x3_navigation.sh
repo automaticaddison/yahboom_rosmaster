@@ -3,34 +3,13 @@
 
 cleanup() {
     echo "Cleaning up..."
-    echo "Killing all ROS 2 and Gazebo related processes..."
-    sleep 5
-    pkill -9 -f "ros2|gazebo|gz|nav2|amcl|bt_navigator|nav_to_pose|rviz2|python3|assisted_teleop|cmd_vel_relay|robot_state_publisher|joint_state_publisher|move_to_free|mqtt|autodock|cliff_detection|moveit|move_group|basic_navigator"
-    sleep 0.2
+    sleep 5.0
+    pkill -9 -f "ros2|gazebo|gz|nav2|amcl|bt_navigator|nav_to_pose|rviz2|assisted_teleop|cmd_vel_relay|robot_state_publisher|joint_state_publisher|move_to_free|mqtt|autodock|cliff_detection|moveit|move_group|basic_navigator"
 
-    echo "Removing IPC resources..."
-    ipcrm -a
-    sleep 0.2
-
-    echo "Cleaning up shared memory..."
-    rm -rf /dev/shm/fastrtps_* /dev/shm/sem.fastrtps_*
-    sleep 0.2
-
-    echo "Cleaning up temporary files..."
-    rm -rf /tmp/fastrtps* /tmp/ros* /tmp/snap.ros* /tmp/*.sem /var/run/ros*
-    sleep 0.2
-
-    echo "Restarting ROS 2 daemon..."
-    ros2 daemon stop
-    sleep 0.2
-    ros2 daemon start
-
-    kill 0
-    exit
 }
 
 # Set up cleanup trap
-trap 'cleanup' SIGINT
+trap 'cleanup' SIGINT SIGTERM
 
 # Check if SLAM argument is provided
 if [ "$1" = "slam" ]; then
