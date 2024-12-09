@@ -17,6 +17,7 @@
   <depend>image_view</depend>
   <depend>geometry_msgs</depend>
   <depend>nav2_simple_commander</depend>
+  <depend>topic_tools</depend>
   <depend>tf2_ros</depend>
 
   <test_depend>ament_lint_auto</test_depend>
