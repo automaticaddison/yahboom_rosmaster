@@ -8,7 +8,7 @@ It is particularly important for AprilTag detection accuracy.
 
 Subscription Topics:
     /cam_1/color/image_raw (sensor_msgs/msg/Image): Raw camera image input
-    /cam_1/depth/camera_info (sensor_msgs/msg/CameraInfo): Camera calibration information
+    /cam_1/color/camera_info (sensor_msgs/msg/CameraInfo): Camera calibration information
 
 Publishing Topics:
     /cam_1/color/image_rect (sensor_msgs/msg/Image): Rectified (undistorted) output image
