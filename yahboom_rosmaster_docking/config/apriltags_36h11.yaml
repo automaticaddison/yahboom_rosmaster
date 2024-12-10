@@ -1,0 +1,21 @@
+/**:
+    ros__parameters:
+        image_transport: raw    # Controls image compression - 'raw' means uncompressed images
+        family: 36h11           # The type/style of AprilTag - 36h11 is a common, reliable family
+        size: 0.25              # default/global tag edge size in meters that will be used for all detected AprilTags unless overridden
+        max_hamming: 0          # How many bit errors to tolerate - 0 means no errors allowed, making detection stricter
+
+        # see "apriltag.h" 'struct apriltag_detector' for more documentation on these optional parameters
+        detector:
+            threads: 1          # How many CPU threads to use - higher numbers can make detection faster
+            decimate: 2.0       # Makes image smaller for faster detection (2.0 = use half resolution)
+            blur: 0.0           # How much to blur the image - can help with noisy images (0.0 = no blur)
+            refine: True        # Whether to fine-tune tag corners for better accuracy
+            sharpening: 0.25    # How much to sharpen the image - can help see tag edges better
+            debug: False        # Whether to save debug images - useful for troubleshooting
+
+        # optional list of tags
+        tag:
+            ids: [0]                           # Which tag IDs to look for
+            #frames: [charging_dock_apriltag]  # What to name each tag's coordinate frame
+            #sizes: [0.25]                     # Individual size overrides for specific tags

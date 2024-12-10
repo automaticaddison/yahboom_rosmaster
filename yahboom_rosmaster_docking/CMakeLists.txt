@@ -18,7 +18,7 @@ find_package(tf2_ros REQUIRED)
 
 # Copy necessary files to designated locations in the project
 install (
-  DIRECTORY launch
+  DIRECTORY config launch
   DESTINATION share/${PROJECT_NAME}
 )
 
