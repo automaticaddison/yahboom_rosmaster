@@ -2,7 +2,7 @@
     ros__parameters:
         image_transport: raw    # Controls image compression - 'raw' means uncompressed images
         family: 36h11           # The type/style of AprilTag - 36h11 is a common, reliable family
-        size: 0.25              # default/global tag edge size in meters that will be used for all detected AprilTags unless overridden
+        size: 0.08              # default/global tag edge size in meters that will be used for all detected AprilTags unless overridden
         max_hamming: 0          # How many bit errors to tolerate - 0 means no errors allowed, making detection stricter
 
         # see "apriltag.h" 'struct apriltag_detector' for more documentation on these optional parameters
