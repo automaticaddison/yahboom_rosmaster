@@ -47,7 +47,7 @@ def generate_launch_description():
     declare_camera_namespace_cmd = DeclareLaunchArgument(
         name='camera_namespace',
         default_value='cam_1',
-        description='Namespace for the nodes'
+        description='Namespace for the camera and AprilTag nodes'
     )
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(

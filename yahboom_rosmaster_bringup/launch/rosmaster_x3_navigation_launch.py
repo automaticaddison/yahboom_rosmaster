@@ -5,14 +5,13 @@ Launch Nav2 for the Yahboom ROSMASTER X3 robot in Gazebo.
 This launch file sets up a complete ROS 2 navigation environment.
 
 :author: Addison Sears-Collins
-:date: November 30, 2024
+:date: December 10, 2024
 """
 
-import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -25,11 +24,13 @@ def generate_launch_description():
         LaunchDescription: A complete launch description for the robot.
     """
     # Constants for paths to different packages
+    package_name_docking = 'yahboom_rosmaster_docking'
     package_name_gazebo = 'yahboom_rosmaster_gazebo'
     package_name_localization = 'yahboom_rosmaster_localization'
     package_name_navigation = 'yahboom_rosmaster_navigation'
 
     # Launch and config file paths
+    apriltag_launch_file_path = 'launch/apriltag_dock_pose_publisher.launch.py'
     gazebo_launch_file_path = 'launch/yahboom_rosmaster.gazebo.launch.py'
     ekf_launch_file_path = 'launch/ekf_gazebo.launch.py'
     ekf_config_file_path = 'config/ekf.yaml'
@@ -38,42 +39,31 @@ def generate_launch_description():
     rviz_config_file_path = 'rviz/nav2_default_view.rviz'
 
     # Set the path to different packages
+    pkg_share_docking = FindPackageShare(
+        package=package_name_docking).find(package_name_docking)
     pkg_share_gazebo = FindPackageShare(package=package_name_gazebo).find(package_name_gazebo)
     pkg_share_localization = FindPackageShare(
         package=package_name_localization).find(package_name_localization)
     pkg_share_navigation = FindPackageShare(
         package=package_name_navigation).find(package_name_navigation)
 
-    package_name_docking = 'yahboom_rosmaster_docking'
-    pkg_share_docking = FindPackageShare(
-        package=package_name_docking).find(package_name_docking)
-    apriltag_launch_file_path = 'launch/apriltag_dock_pose_publisher.launch.py'
-    default_apriltag_launch_path = os.path.join(pkg_share_docking, apriltag_launch_file_path)
-    apriltag_launch_file = LaunchConfiguration('apriltag_launch_file')
-    camera_namespace = LaunchConfiguration('camera_namespace')
-    declare_apriltag_launch_file_cmd = DeclareLaunchArgument(
-        name='apriltag_launch_file',
-        default_value=default_apriltag_launch_path,
-        description='Full path to the AprilTag dock pose publisher launch file')
-    declare_camera_namespace_cmd = DeclareLaunchArgument(
-        name='camera_namespace',
-        default_value='cam_1',
-        description='Namespace for the camera')
-
     # Set default paths
-    default_gazebo_launch_path = os.path.join(pkg_share_gazebo, gazebo_launch_file_path)
-    default_ekf_launch_path = os.path.join(pkg_share_localization, ekf_launch_file_path)
-    default_ekf_config_path = os.path.join(pkg_share_localization, ekf_config_file_path)
-    default_rviz_config_path = os.path.join(pkg_share_navigation, rviz_config_file_path)
+    default_apriltag_launch_path = PathJoinSubstitution(
+        [pkg_share_docking, apriltag_launch_file_path])
+    default_gazebo_launch_path = PathJoinSubstitution([pkg_share_gazebo, gazebo_launch_file_path])
+    default_ekf_launch_path = PathJoinSubstitution([pkg_share_localization, ekf_launch_file_path])
+    default_ekf_config_path = PathJoinSubstitution([pkg_share_localization, ekf_config_file_path])
+    default_rviz_config_path = PathJoinSubstitution([pkg_share_navigation, rviz_config_file_path])
 
     nav2_dir = FindPackageShare(package='nav2_bringup').find('nav2_bringup')
-    nav2_launch_dir = os.path.join(nav2_dir, 'launch')
-    nav2_params_path = os.path.join(pkg_share_navigation, nav2_params_path)
-    static_map_path = os.path.join(pkg_share_navigation, map_file_path)
+    nav2_launch_dir = PathJoinSubstitution([nav2_dir, 'launch'])
+    nav2_params_file_path = PathJoinSubstitution([pkg_share_navigation, nav2_params_path])
+    static_map_path = PathJoinSubstitution([pkg_share_navigation, map_file_path])
 
     # Launch configuration variables
     # Config and launch files
     autostart = LaunchConfiguration('autostart')
+    camera_namespace = LaunchConfiguration('camera_namespace')
     enable_odom_tf = LaunchConfiguration('enable_odom_tf')
     ekf_config_file = LaunchConfiguration('ekf_config_file')
     ekf_launch_file = LaunchConfiguration('ekf_launch_file')
@@ -115,6 +105,11 @@ def generate_launch_description():
         default_value='true',
         description='Automatically startup the Nav2 stack')
 
+    declare_camera_namespace_cmd = DeclareLaunchArgument(
+        name='camera_namespace',
+        default_value='cam_1',
+        description='Namespace for the camera')
+
     declare_ekf_config_file_cmd = DeclareLaunchArgument(
         name='ekf_config_file',
         default_value=default_ekf_config_path,
@@ -148,7 +143,7 @@ def generate_launch_description():
 
     declare_nav2_params_file_cmd = DeclareLaunchArgument(
         name='nav2_params_file',
-        default_value=nav2_params_path,
+        default_value=nav2_params_file_path,
         description='Full path to the ROS2 parameters file to use for navigation nodes')
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
@@ -257,7 +252,7 @@ def generate_launch_description():
 
     # Specify the actions
     start_apriltag_dock_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([apriltag_launch_file]),
+        PythonLaunchDescriptionSource([default_apriltag_launch_path]),
         launch_arguments={
             'use_sim_time': use_sim_time,
             'camera_namespace': camera_namespace
@@ -323,7 +318,8 @@ def generate_launch_description():
 
     # Launch the ROS 2 Navigation Stack
     start_ros2_navigation_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(nav2_launch_dir, 'bringup_launch.py')),
+        PythonLaunchDescriptionSource([PathJoinSubstitution([nav2_launch_dir, 'bringup_launch.py'])]
+                                      ),
         launch_arguments={
             'namespace': namespace,
             'use_namespace': use_namespace,
@@ -343,6 +339,7 @@ def generate_launch_description():
     # Add all launch arguments
     # Config and launch files
     ld.add_action(declare_autostart_cmd)
+    ld.add_action(declare_camera_namespace_cmd)
     ld.add_action(declare_enable_odom_tf_cmd)
     ld.add_action(declare_ekf_config_file_cmd)
     ld.add_action(declare_ekf_launch_file_cmd)
@@ -380,15 +377,12 @@ def generate_launch_description():
     ld.add_action(declare_use_sim_time_cmd)
 
     # Add any actions
+    ld.add_action(start_apriltag_dock_cmd)
     ld.add_action(start_assisted_teleop_cmd)
     ld.add_action(start_cmd_vel_relay_cmd)
     ld.add_action(start_ekf_cmd)
     ld.add_action(start_gazebo_cmd)
     ld.add_action(start_nav_to_pose_cmd)
     ld.add_action(start_ros2_navigation_cmd)
-
-    ld.add_action(declare_camera_namespace_cmd)
-    ld.add_action(declare_apriltag_launch_file_cmd)
-    ld.add_action(start_apriltag_dock_cmd)
 
     return ld
