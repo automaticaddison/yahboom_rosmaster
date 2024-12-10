@@ -44,6 +44,22 @@ def generate_launch_description():
     pkg_share_navigation = FindPackageShare(
         package=package_name_navigation).find(package_name_navigation)
 
+    package_name_docking = 'yahboom_rosmaster_docking'
+    pkg_share_docking = FindPackageShare(
+        package=package_name_docking).find(package_name_docking)
+    apriltag_launch_file_path = 'launch/apriltag_dock_pose_publisher.launch.py'
+    default_apriltag_launch_path = os.path.join(pkg_share_docking, apriltag_launch_file_path)
+    apriltag_launch_file = LaunchConfiguration('apriltag_launch_file')
+    camera_namespace = LaunchConfiguration('camera_namespace')
+    declare_apriltag_launch_file_cmd = DeclareLaunchArgument(
+        name='apriltag_launch_file',
+        default_value=default_apriltag_launch_path,
+        description='Full path to the AprilTag dock pose publisher launch file')
+    declare_camera_namespace_cmd = DeclareLaunchArgument(
+        name='camera_namespace',
+        default_value='cam_1',
+        description='Namespace for the camera')
+
     # Set default paths
     default_gazebo_launch_path = os.path.join(pkg_share_gazebo, gazebo_launch_file_path)
     default_ekf_launch_path = os.path.join(pkg_share_localization, ekf_launch_file_path)
@@ -240,6 +256,13 @@ def generate_launch_description():
         description='Use simulation (Gazebo) clock if true')
 
     # Specify the actions
+    start_apriltag_dock_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([apriltag_launch_file]),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'camera_namespace': camera_namespace
+        }.items()
+    )
 
     start_assisted_teleop_cmd = Node(
         package='yahboom_rosmaster_navigation',
@@ -363,5 +386,9 @@ def generate_launch_description():
     ld.add_action(start_gazebo_cmd)
     ld.add_action(start_nav_to_pose_cmd)
     ld.add_action(start_ros2_navigation_cmd)
+
+    ld.add_action(declare_camera_namespace_cmd)
+    ld.add_action(declare_apriltag_launch_file_cmd)
+    ld.add_action(start_apriltag_dock_cmd)
 
     return ld

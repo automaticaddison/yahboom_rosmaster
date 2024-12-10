@@ -35,7 +35,7 @@ def generate_launch_description():
 
     # Launch configuration variables
     apriltag_config_file = LaunchConfiguration('apriltag_config_file')
-    namespace = LaunchConfiguration('namespace')
+    camera_namespace = LaunchConfiguration('camera_namespace')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     # Declare the launch arguments
@@ -44,8 +44,8 @@ def generate_launch_description():
         default_value=default_apriltag_ros_config_file_path,
         description='Full path to the AprilTag config file to use')
 
-    declare_namespace_cmd = DeclareLaunchArgument(
-        name='namespace',
+    declare_camera_namespace_cmd = DeclareLaunchArgument(
+        name='camera_namespace',
         default_value='cam_1',
         description='Namespace for the nodes'
     )
@@ -61,7 +61,7 @@ def generate_launch_description():
         package='image_proc',
         plugin='image_proc::RectifyNode',
         name='rectify_node',
-        namespace=namespace,
+        namespace=camera_namespace,
         remappings=[
             ('image', 'color/image_raw'),
             ('image_rect', 'color/image_rect'),
@@ -80,7 +80,7 @@ def generate_launch_description():
         package='apriltag_ros',
         plugin='AprilTagNode',
         name='apriltag_node',
-        namespace=namespace,
+        namespace=camera_namespace,
         remappings=[
             ('image_rect', 'color/image_rect'),
             ('camera_info', 'color/camera_info'),
@@ -95,7 +95,7 @@ def generate_launch_description():
     # Create the container
     start_apriltag_dock_pose_publisher = ComposableNodeContainer(
         name='apriltag_dock_pose_publisher',
-        namespace=namespace,
+        namespace=camera_namespace,
         package='rclcpp_components',
         executable='component_container',
         composable_node_descriptions=[
@@ -110,7 +110,7 @@ def generate_launch_description():
 
     # Add the arguments
     ld.add_action(declare_apriltag_config_file_cmd)
-    ld.add_action(declare_namespace_cmd)
+    ld.add_action(declare_camera_namespace_cmd)
     ld.add_action(declare_use_sim_time_cmd)
 
     # Add the container
