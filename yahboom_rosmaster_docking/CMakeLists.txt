@@ -14,7 +14,6 @@ find_package(rclpy REQUIRED)
 find_package(apriltag_ros REQUIRED)
 find_package(apriltag_msgs REQUIRED)
 find_package(image_proc REQUIRED)
-find_package(topic_tools REQUIRED)
 find_package(tf2_ros REQUIRED)
 
 # Copy necessary files to designated locations in the project
