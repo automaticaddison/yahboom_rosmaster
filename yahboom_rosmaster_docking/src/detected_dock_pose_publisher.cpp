@@ -1,5 +1,5 @@
 /**
- * @file dock_pose_publisher.cpp
+ * @file detected_dock_pose_publisher.cpp
  * @brief Publishes the pose of an AprilTag located on/near a docking station
  *
  * This program detects an AprilTag that is mounted near or on a docking station and publishes
@@ -49,16 +49,16 @@
  * in the optical frame coordinate system. The Nav2 docking system can then use this tag pose
  * as a reference to compute the actual docking position.
  */
-class DockPosePublisher : public rclcpp::Node
+class DetectedDockPosePublisher : public rclcpp::Node
 {
 public:
   /**
-   * @brief Constructor for the DockPosePublisher node
+   * @brief Constructor for the DetectedDockPosePublisher node
    *
    * Initializes the node, sets up parameters, and creates publishers and transform listeners
    */
-  DockPosePublisher()
-  : Node("dock_pose_publisher")
+  DetectedDockPosePublisher()
+  : Node("detected_dock_pose_publisher")
   {
     // Declare parameters with default values and documentation
     this->declare_parameter("parent_frame", "cam_1_depth_optical_frame");
@@ -83,11 +83,11 @@ public:
     // Create a timer that will trigger pose updates
     timer_ = this->create_wall_timer(
       std::chrono::milliseconds(static_cast<int>(1000.0 / publish_rate)),
-      std::bind(&DockPosePublisher::timer_callback, this));
+      std::bind(&DetectedDockPosePublisher::timer_callback, this));
 
     // Log that we've successfully initialized
     RCLCPP_INFO(this->get_logger(),
-      "Dock pose publisher initialized with parent frame: '%s' and child frame: '%s'",
+      "Detected dock pose publisher initialized with parent frame: '%s' and child frame: '%s'",
       parent_frame_.c_str(), child_frame_.c_str());
   }
 
@@ -159,7 +159,7 @@ int main(int argc, char * argv[])
   // Initialize ROS
   rclcpp::init(argc, argv);
   // Create and spin (run) the node
-  rclcpp::spin(std::make_shared<DockPosePublisher>());
+  rclcpp::spin(std::make_shared<DetectedDockPosePublisher>());
   // Clean up ROS and exit
   rclcpp::shutdown();
   return 0;

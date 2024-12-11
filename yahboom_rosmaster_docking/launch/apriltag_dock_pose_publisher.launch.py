@@ -129,7 +129,7 @@ def generate_launch_description():
    # Create the detected dock pose publisher node
     start_detected_dock_pose_publisher = Node(
         package='yahboom_rosmaster_docking',
-        executable='dock_pose_publisher',
+        executable='detected_dock_pose_publisher',
         parameters=[{
             'use_sim_time': use_sim_time,
             'parent_frame': [camera_namespace, TextSubstitution(text=''), camera_frame_type],
