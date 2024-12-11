@@ -110,11 +110,10 @@ private:
     dock_pose.header.frame_id = parent_frame_;
 
     try {
-      // Look up the transform from camera to tag
-      // Following the tf2::Buffer API: lookupTransform(target_frame, source_frame, ...)
+      // Look up the transform
       geometry_msgs::msg::TransformStamped transform = tf_buffer_->lookupTransform(
-        child_frame_,      // target frame (tag)
-        parent_frame_,     // source frame (camera)
+        parent_frame_,
+        child_frame_,
         tf2::TimePointZero // get latest transform
       );
 
