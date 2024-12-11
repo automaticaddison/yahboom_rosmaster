@@ -126,8 +126,8 @@ def generate_launch_description():
         output='screen'
     )
 
-   # Create the dock pose publisher node
-    start_dock_pose_publisher = Node(
+   # Create the detected dock pose publisher node
+    start_detected_dock_pose_publisher = Node(
         package='yahboom_rosmaster_docking',
         executable='dock_pose_publisher',
         parameters=[{
@@ -152,6 +152,6 @@ def generate_launch_description():
 
     # Add the container
     ld.add_action(start_apriltag_dock_pose_publisher)
-    ld.add_action(start_dock_pose_publisher)
+    ld.add_action(start_detected_dock_pose_publisher)
 
     return ld
