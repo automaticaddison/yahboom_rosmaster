@@ -16,6 +16,18 @@ find_package(apriltag_msgs REQUIRED)
 find_package(image_proc REQUIRED)
 find_package(tf2_ros REQUIRED)
 
+add_executable(dock_pose_publisher src/dock_pose_publisher.cpp)
+ament_target_dependencies(dock_pose_publisher
+  rclcpp
+  geometry_msgs
+  tf2_ros
+)
+
+install(TARGETS
+  dock_pose_publisher
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 # Copy necessary files to designated locations in the project
 install (
   DIRECTORY config launch
