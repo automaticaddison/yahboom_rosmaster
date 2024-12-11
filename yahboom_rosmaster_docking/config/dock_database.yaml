@@ -1,0 +1,6 @@
+docks:
+  dock0:
+    type: "rosmaster_x3_dock"
+    frame: "map"
+    pose: [-4.96, 1.5, 0.0]
+    id: "0"

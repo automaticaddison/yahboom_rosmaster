@@ -427,48 +427,58 @@ collision_monitor:
 docking_server:
   ros__parameters:
     controller_frequency: 10.0
-    initial_perception_timeout: 5.0
+    initial_perception_timeout: 20.0 # Default 5.0
     wait_charge_timeout: 5.0
     dock_approach_timeout: 30.0
     undock_linear_tolerance: 0.05
-    undock_angular_tolerance: 0.1
+    undock_angular_tolerance: 0.05
     max_retries: 3
     base_frame: "base_link"
     fixed_frame: "odom"
-    dock_backwards: true
+    dock_backwards: false
     dock_prestaging_tolerance: 0.5
 
     # Types of docks
-    dock_plugins: ['simple_charging_dock']
-    simple_charging_dock:
+    dock_plugins: ['rosmaster_x3_dock']
+    rosmaster_x3_dock:
       plugin: 'opennav_docking::SimpleChargingDock'
       docking_threshold: 0.05
       staging_x_offset: -0.7
+      staging_yaw_offset: 0.0
       use_external_detection_pose: true
       use_battery_status: false # true
-      use_stall_detection: false # true
+      use_stall_detection: true # true
+      stall_joint_names: [
+        "back_left_wheel_joint",
+        "front_left_wheel_joint",
+        "front_right_wheel_joint",
+        "back_right_wheel_joint"
+      ]
+      stall_velocity_threshold: 1.0
+      stall_effort_threshold: 1.0
+      charging_threshold: 0.5
 
       external_detection_timeout: 1.0
       external_detection_translation_x: -0.18
       external_detection_translation_y: 0.0
       external_detection_rotation_roll: -1.57
-      external_detection_rotation_pitch: -1.57
+      external_detection_rotation_pitch: 1.57
       external_detection_rotation_yaw: 0.0
       filter_coef: 0.1
 
+
     # Dock instances
-    # The following example illustrates configuring dock instances.
-    # docks: ['home_dock']  # Input your docks here
-    # home_dock:
-    #   type: 'simple_charging_dock'
-    #   frame: map
-    #   pose: [0.0, 0.0, 0.0]
+    dock_database: $(find-pkg-share yahboom_rosmaster_docking)/config/dock_database.yaml
 
     controller:
       k_phi: 3.0
       k_delta: 2.0
-      v_linear_min: 0.15
-      v_linear_max: 0.15
+      beta: 0.4
+      lambda: 2.0
+      v_linear_min: 0.1
+      v_linear_max: 0.25
+      v_angular_max: 0.75
+      slowdown_radius: 0.25
       use_collision_detection: true
       costmap_topic: "/local_costmap/costmap_raw"
       footprint_topic: "/local_costmap/published_footprint"
