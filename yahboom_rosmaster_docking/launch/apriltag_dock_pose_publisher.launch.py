@@ -9,7 +9,7 @@ geometry_msgs/PoseStamped message.
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, TextSubstitution
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
 from launch_ros.substitutions import FindPackageShare
@@ -132,8 +132,8 @@ def generate_launch_description():
         executable='dock_pose_publisher',
         parameters=[{
             'use_sim_time': use_sim_time,
-            'parent_frame': camera_namespace + camera_frame_type,
-            'child_frame': f'{tag_family}:{tag_id}',
+            'parent_frame': [camera_namespace, TextSubstitution(text=''), camera_frame_type],
+            'child_frame': [tag_family, TextSubstitution(text=':'), tag_id],
             'publish_rate': 10.0
         }],
         output='screen'
