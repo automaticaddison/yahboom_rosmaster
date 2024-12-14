@@ -148,7 +148,6 @@
             <near>${clip_near}</near>
             <far>${clip_far}</far>
           </clip>
-          <optical_frame_id>${prefix}${camera_name}_depth_optical_frame</optical_frame_id>
         </camera>
         <always_on>${always_on}</always_on>
         <gz_frame_id>${prefix}${camera_name}_link</gz_frame_id>
