@@ -42,29 +42,28 @@
  */
 TEST(TestLoadMecanumDriveController, load_controller)
 {
-  // Initialize ROS 2 without any command line arguments
-  rclcpp::init(0, nullptr);
-
   // Create a single-threaded executor for running the controller
   std::shared_ptr<rclcpp::Executor> executor =
     std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
-
+  
   // Create the controller manager with a minimal robot description
-  auto node = rclcpp::Node::make_shared("test_controller_manager");
   controller_manager::ControllerManager cm(
-    std::make_unique<hardware_interface::ResourceManager>(
-      ros2_control_test_assets::minimal_robot_urdf,
-      node->get_node_clock_interface(),
-      node->get_node_logging_interface()),
-    executor,
-    "test_controller_manager");
-
-  // Attempt to load the controller and verify no exceptions are thrown
-  ASSERT_NO_THROW(
-    cm.load_controller(
-      "test_mecanum_drive_controller",
-      "mecanum_drive_controller/MecanumDriveController"));
-
-  // Clean up ROS 2
-  rclcpp::shutdown();
+    executor, ros2_control_test_assets::minimal_robot_urdf, true, "test_controller_manager");
+  
+  // Set parameters before loading
+  cm.set_parameter(
+    {"test_mecanum_drive_controller.type", "mecanum_drive_controller/MecanumDriveController"});
+    
+  // Use ASSERT_NE instead of ASSERT_NO_THROW
+  ASSERT_NE(cm.load_controller("test_mecanum_drive_controller"), nullptr);
 }
+
+int main(int argc, char ** argv)
+{
+  ::testing::InitGoogleTest(&argc, argv);
+  rclcpp::init(argc, argv);
+  int result = RUN_ALL_TESTS();
+  rclcpp::shutdown();
+  return result;
+}
+

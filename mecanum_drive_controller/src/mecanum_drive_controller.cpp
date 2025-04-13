@@ -186,10 +186,10 @@ controller_interface::return_type MecanumDriveController::update(
         wheel_handles_[BACK_LEFT].feedback && wheel_handles_[BACK_RIGHT].feedback)
       {
         odometry_.update(
-          wheel_handles_[FRONT_LEFT].feedback->get().get_value(),
-          wheel_handles_[FRONT_RIGHT].feedback->get().get_value(),
-          wheel_handles_[BACK_LEFT].feedback->get().get_value(),
-          wheel_handles_[BACK_RIGHT].feedback->get().get_value(),
+          wheel_handles_[FRONT_LEFT].feedback->get().get_optional().value_or(0.0),
+          wheel_handles_[FRONT_RIGHT].feedback->get().get_optional().value_or(0.0),
+          wheel_handles_[BACK_LEFT].feedback->get().get_optional().value_or(0.0),
+          wheel_handles_[BACK_RIGHT].feedback->get().get_optional().value_or(0.0),
           time);
       }
       else
@@ -204,10 +204,10 @@ controller_interface::return_type MecanumDriveController::update(
           wheel_handles_[BACK_LEFT].feedback && wheel_handles_[BACK_RIGHT].feedback)
       {
         odometry_.updateFromVelocity(
-          wheel_handles_[FRONT_LEFT].feedback->get().get_value(),
-          wheel_handles_[FRONT_RIGHT].feedback->get().get_value(),
-          wheel_handles_[BACK_LEFT].feedback->get().get_value(),
-          wheel_handles_[BACK_RIGHT].feedback->get().get_value(),
+          wheel_handles_[FRONT_LEFT].feedback->get().get_optional().value_or(0.0),
+          wheel_handles_[FRONT_RIGHT].feedback->get().get_optional().value_or(0.0),
+          wheel_handles_[BACK_LEFT].feedback->get().get_optional().value_or(0.0),
+          wheel_handles_[BACK_RIGHT].feedback->get().get_optional().value_or(0.0),
           time);
       }
       else

@@ -7,7 +7,7 @@
  * taking into account the unique properties of mecanum wheels that allow omnidirectional movement.
  *
  * @author Addison Sears-Collins
- * @date November 18, 2024
+ * @date April 13, 2025
  */
 
 #ifndef MECANUM_DRIVE_CONTROLLER__MECANUM_DRIVE_CONTROLLER_HPP_
@@ -39,7 +39,7 @@
 #include "tf2_msgs/msg/tf_message.hpp"
 
 // Auto-generated parameters
-#include "mecanum_drive_controller_parameters.hpp"
+#include <mecanum_drive_controller/mecanum_drive_controller_parameters.hpp>
 
 namespace mecanum_drive_controller
 {
