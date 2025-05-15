@@ -29,7 +29,7 @@
  *     ~/cmd_vel_out (geometry_msgs/msg/TwistStamped): Limited velocity commands (if enabled)
  *
  * @author Addison Sears-Collins
- * @date November 18, 2024
+ * @date May 15, 2025
  */
 
 #include <memory>
@@ -132,7 +132,10 @@ controller_interface::return_type MecanumDriveController::update(
   }
 
   std::shared_ptr<Twist> last_command_msg;
-  received_velocity_msg_ptr_.get(last_command_msg);
+  received_velocity_msg_ptr_.get(
+    [&](const std::shared_ptr<Twist> & msg) {
+    last_command_msg = msg;
+  });
 
   if (last_command_msg == nullptr)
   {
@@ -310,17 +313,36 @@ controller_interface::return_type MecanumDriveController::update(
     linear_command_x - linear_command_y + angular_command * (L + W)) / back_right_radius;
 
   // Set wheel velocities using wheel indices
-  if (!wheel_handles_[FRONT_LEFT].velocity->get().set_value(front_left_velocity)) {
-    RCLCPP_ERROR(logger, "Failed to set front left wheel velocity");
+  if (wheel_handles_[FRONT_LEFT].velocity) {
+    if (!wheel_handles_[FRONT_LEFT].velocity.value().get().set_value(front_left_velocity)) {
+      RCLCPP_ERROR(logger, "Failed to set front left wheel velocity");
+    }
+  } else {
+    RCLCPP_ERROR(logger, "Front left velocity handle is not available");
   }
-  if (!wheel_handles_[FRONT_RIGHT].velocity->get().set_value(front_right_velocity)) {
-    RCLCPP_ERROR(logger, "Failed to set front right wheel velocity");
+
+  if (wheel_handles_[FRONT_RIGHT].velocity) {
+    if (!wheel_handles_[FRONT_RIGHT].velocity.value().get().set_value(front_right_velocity)) {
+      RCLCPP_ERROR(logger, "Failed to set front right wheel velocity");
+    }
+  } else {
+    RCLCPP_ERROR(logger, "Front right velocity handle is not available");
   }
-  if (!wheel_handles_[BACK_LEFT].velocity->get().set_value(back_left_velocity)) {
-    RCLCPP_ERROR(logger, "Failed to set back left wheel velocity");
+
+  if (wheel_handles_[BACK_LEFT].velocity) {
+    if (!wheel_handles_[BACK_LEFT].velocity.value().get().set_value(back_left_velocity)) {
+      RCLCPP_ERROR(logger, "Failed to set back left wheel velocity");
+    }
+  } else {
+    RCLCPP_ERROR(logger, "Back left velocity handle is not available");
   }
-  if (!wheel_handles_[BACK_RIGHT].velocity->get().set_value(back_right_velocity)) {
-    RCLCPP_ERROR(logger, "Failed to set back right wheel velocity");
+
+  if (wheel_handles_[BACK_RIGHT].velocity) {
+    if (!wheel_handles_[BACK_RIGHT].velocity.value().get().set_value(back_right_velocity)) {
+      RCLCPP_ERROR(logger, "Failed to set back right wheel velocity");
+    }
+  } else {
+    RCLCPP_ERROR(logger, "Back right velocity handle is not available");
   }
 
   return controller_interface::return_type::OK;
@@ -401,7 +423,10 @@ controller_interface::CallbackReturn MecanumDriveController::on_configure(
   }
 
   const Twist empty_twist;
-  received_velocity_msg_ptr_.set(std::make_shared<Twist>(empty_twist));
+  received_velocity_msg_ptr_.set(
+    [&](std::shared_ptr<Twist> & msg) {
+      msg = std::make_shared<Twist>();
+    });
 
   // Fill last two commands with default constructed commands
   previous_commands_.emplace(empty_twist);
@@ -424,7 +449,11 @@ controller_interface::CallbackReturn MecanumDriveController::on_configure(
           "time, this message will only be shown once");
         msg->header.stamp = get_node()->get_clock()->now();
       }
-      received_velocity_msg_ptr_.set(std::move(msg));
+      received_velocity_msg_ptr_.set(
+        [&](std::shared_ptr<Twist> & stored_msg) {
+        stored_msg = std::move(msg);
+        });
+
     });
 
   // Initialize odometry publisher and message
@@ -562,7 +591,10 @@ controller_interface::CallbackReturn MecanumDriveController::on_cleanup(
     return controller_interface::CallbackReturn::ERROR;
   }
 
-  received_velocity_msg_ptr_.set(std::make_shared<Twist>());
+  received_velocity_msg_ptr_.set([](std::shared_ptr<Twist> & stored_msg) {
+    stored_msg = std::make_shared<Twist>();
+  });
+
   return controller_interface::CallbackReturn::SUCCESS;
 }
 
