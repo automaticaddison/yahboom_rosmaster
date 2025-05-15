@@ -7,7 +7,7 @@
  * taking into account the unique properties of mecanum wheels that allow omnidirectional movement.
  *
  * @author Addison Sears-Collins
- * @date April 13, 2025
+ * @date May 15, 2025
  */
 
 #ifndef MECANUM_DRIVE_CONTROLLER__MECANUM_DRIVE_CONTROLLER_HPP_
@@ -34,8 +34,8 @@
 #include "odometry.hpp"
 // ROS 2 lifecycle and utilities
 #include "rclcpp_lifecycle/state.hpp"
-#include "realtime_tools/realtime_box.h"
-#include "realtime_tools/realtime_publisher.h"
+#include "realtime_tools/realtime_box.hpp"
+#include "realtime_tools/realtime_publisher.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
 
 // Auto-generated parameters
