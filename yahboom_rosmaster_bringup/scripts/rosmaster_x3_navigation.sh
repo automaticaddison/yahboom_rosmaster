@@ -23,7 +23,7 @@ fi
 # To change Gazebo camera pose: gz service -s /gui/move_to/pose --reqtype gz.msgs.GUICamera --reptype gz.msgs.Boolean --timeout 2000 --req "pose: {position: {x: 0.0, y: -2.0, z: 2.0} orientation: {x: -0.2706, y: 0.2706, z: 0.6533, w: 0.6533}}"
 
 echo "Launching Gazebo simulation with Nav2..."
-ros2 launch yahboom_rosmaster_bringup rosmaster_x3_navigation_launch.py \
+ros2 launch yahboom_rosmaster_bringup rosmaster_x3_navigation.launch.py \
     enable_odom_tf:=false \
     headless:=False \
     load_controllers:=true \
