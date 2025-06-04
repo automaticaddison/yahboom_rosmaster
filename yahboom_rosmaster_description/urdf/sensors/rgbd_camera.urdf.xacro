@@ -150,7 +150,7 @@
           </clip>
         </camera>
         <always_on>${always_on}</always_on>
-        <gz_frame_id>${prefix}${camera_name}_link</gz_frame_id>
+        <gz_frame_id>${prefix}${camera_name}_depth_optical_frame</gz_frame_id>
         <topic>${camera_name}</topic>
         <update_rate>${update_rate}</update_rate>
         <visualize>${visualize}</visualize>
