@@ -295,10 +295,10 @@
     </library_effects>
     <library_images>
         <image id="ID7">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe_table/materials/textures/Wood_Floor_Dark.jpg</init_from>
+            <init_from>model://cafe_table/materials/textures/Wood_Floor_Dark.jpg</init_from>
         </image>
         <image id="ID16">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe_table/materials/textures/Maple.jpg</init_from>
+            <init_from>model://cafe_table/materials/textures/Maple.jpg</init_from>
         </image>
     </library_images>
     <scene>

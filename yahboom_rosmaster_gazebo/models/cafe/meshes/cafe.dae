@@ -17694,49 +17694,49 @@
     </library_effects>
     <library_images>
         <image id="ID203">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_2.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_2.jpg</init_from>
         </image>
         <image id="ID494">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_10.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_10.jpg</init_from>
         </image>
         <image id="ID569">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_34.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_34.jpg</init_from>
         </image>
         <image id="ID590">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_28.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_28.jpg</init_from>
         </image>
         <image id="ID671">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_26.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_26.jpg</init_from>
         </image>
         <image id="ID721">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_29.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_29.jpg</init_from>
         </image>
         <image id="ID757">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_35.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_35.jpg</init_from>
         </image>
         <image id="ID908">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_23.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_23.jpg</init_from>
         </image>
         <image id="ID1043">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_25.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_25.jpg</init_from>
         </image>
         <image id="ID1056">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_22.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_22.jpg</init_from>
         </image>
         <image id="ID1327">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_24.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_24.jpg</init_from>
         </image>
         <image id="ID1474">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_21.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_21.jpg</init_from>
         </image>
         <image id="ID1603">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_30.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_30.jpg</init_from>
         </image>
         <image id="ID1616">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_31.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_31.jpg</init_from>
         </image>
         <image id="ID2441">
-            <init_from>/home/ubuntu/ros2_ws/install/yahboom_rosmaster_gazebo/share/yahboom_rosmaster_gazebo/models/cafe/materials/textures/__auto_37.jpg</init_from>
+            <init_from>model://cafe/materials/textures/__auto_37.jpg</init_from>
         </image>
     </library_images>
     <scene>
