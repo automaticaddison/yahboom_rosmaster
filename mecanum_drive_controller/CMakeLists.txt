@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.20)
 project(mecanum_drive_controller LANGUAGES CXX)
 
 # Compiler warnings
@@ -55,7 +55,9 @@ target_include_directories(mecanum_drive_controller PUBLIC
 
 target_link_libraries(mecanum_drive_controller PUBLIC mecanum_drive_controller_parameters)
 
-ament_target_dependencies(mecanum_drive_controller PUBLIC ${THIS_PACKAGE_INCLUDE_DEPENDS})
+foreach(dep IN LISTS THIS_PACKAGE_INCLUDE_DEPENDS)
+  target_link_libraries(mecanum_drive_controller PUBLIC ${${dep}_TARGETS})
+endforeach()
 
 # Visibility macros
 target_compile_definitions(mecanum_drive_controller PRIVATE "MECANUM_DRIVE_CONTROLLER_BUILDING_DLL")
@@ -75,9 +77,9 @@ if(BUILD_TESTING)
   # Controller loading test
   #ament_add_gmock(test_load_mecanum_drive_controller
   #  test/test_load_mecanum_drive_controller.cpp)
-  #ament_target_dependencies(test_load_mecanum_drive_controller
-  #  controller_manager
-  #  ros2_control_test_assets
+  #target_link_libraries(test_load_mecanum_drive_controller
+  #  ${controller_manager_TARGETS}
+  #  ${ros2_control_test_assets_TARGETS}
   #)
 endif()
 

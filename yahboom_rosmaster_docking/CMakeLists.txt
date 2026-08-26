@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.20)
 project(yahboom_rosmaster_docking)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -17,10 +17,10 @@ find_package(image_proc REQUIRED)
 find_package(tf2_ros REQUIRED)
 
 add_executable(detected_dock_pose_publisher src/detected_dock_pose_publisher.cpp)
-ament_target_dependencies(detected_dock_pose_publisher
-  rclcpp
-  geometry_msgs
-  tf2_ros
+target_link_libraries(detected_dock_pose_publisher
+  ${rclcpp_TARGETS}
+  ${geometry_msgs_TARGETS}
+  ${tf2_ros_TARGETS}
 )
 
 install(TARGETS

@@ -34,7 +34,7 @@
 #include "odometry.hpp"
 // ROS 2 lifecycle and utilities
 #include "rclcpp_lifecycle/state.hpp"
-#include "realtime_tools/realtime_box.hpp"
+#include "realtime_tools/realtime_thread_safe_box.hpp"
 #include "realtime_tools/realtime_publisher.hpp"
 #include "tf2_msgs/msg/tf_message.hpp"
 
@@ -219,7 +219,14 @@ protected:
   rclcpp::Subscription<Twist>::SharedPtr velocity_command_subscriber_ = nullptr;
 
   // Storage for received velocity commands
-  realtime_tools::RealtimeBox<std::shared_ptr<Twist>> received_velocity_msg_ptr_{nullptr};
+  realtime_tools::RealtimeThreadSafeBox<std::shared_ptr<Twist>> received_velocity_msg_ptr_{nullptr};
+
+  // Lyrical: realtime_tools::RealtimePublisher no longer exposes msg_ or
+  // trylock()/unlockAndPublish(). Keep the messages here and hand a filled
+  // copy to try_publish() instead.
+  nav_msgs::msg::Odometry odometry_message_;
+  tf2_msgs::msg::TFMessage odometry_transform_message_;
+  Twist limited_velocity_message_;
   std::queue<Twist> previous_commands_;  // Stores last two commands
 
   // Speed limiters for each motion direction

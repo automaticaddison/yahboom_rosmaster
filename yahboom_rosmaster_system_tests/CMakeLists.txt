@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.20)
 project(yahboom_rosmaster_system_tests)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -46,40 +46,40 @@ add_executable(set_cleaning_state_service
 )
 
 # Specify dependencies for the target
-ament_target_dependencies(square_mecanum_controller
-  rclcpp
-  geometry_msgs
-  std_msgs
+target_link_libraries(square_mecanum_controller
+  ${rclcpp_TARGETS}
+  ${geometry_msgs_TARGETS}
+  ${std_msgs_TARGETS}
 )
 
 # Specify dependencies for the mecanum parameters node
-ament_target_dependencies(mecanum_parameters_node
-  rclcpp
-  geometry_msgs
-  std_msgs
-  rcl_interfaces
+target_link_libraries(mecanum_parameters_node
+  ${rclcpp_TARGETS}
+  ${geometry_msgs_TARGETS}
+  ${std_msgs_TARGETS}
+  ${rcl_interfaces_TARGETS}
 )
 
 # Specify dependencies for the timed rotation action server
-ament_target_dependencies(timed_rotation_action_server
-  rclcpp
-  rclcpp_action
-  geometry_msgs
-  yahboom_rosmaster_msgs
+target_link_libraries(timed_rotation_action_server
+  ${rclcpp_TARGETS}
+  ${rclcpp_action_TARGETS}
+  ${geometry_msgs_TARGETS}
+  ${yahboom_rosmaster_msgs_TARGETS}
 )
 
 # Specify dependencies for the timed rotation action client
-ament_target_dependencies(timed_rotation_action_client
-  rclcpp
-  rclcpp_action
-  yahboom_rosmaster_msgs
-  std_msgs
+target_link_libraries(timed_rotation_action_client
+  ${rclcpp_TARGETS}
+  ${rclcpp_action_TARGETS}
+  ${yahboom_rosmaster_msgs_TARGETS}
+  ${std_msgs_TARGETS}
 )
 
 # Specify dependencies for the service server
-ament_target_dependencies(set_cleaning_state_service
-  rclcpp
-  yahboom_rosmaster_msgs
+target_link_libraries(set_cleaning_state_service
+  ${rclcpp_TARGETS}
+  ${yahboom_rosmaster_msgs_TARGETS}
 )
 
 
