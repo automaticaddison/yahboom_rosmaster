@@ -14,8 +14,12 @@ Launched Controllers:
 """
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, RegisterEventHandler, TimerAction
+import os
+from pathlib import Path
+
+from launch.actions import RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessExit
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -27,17 +31,26 @@ def generate_launch_description():
     Returns:
         LaunchDescription: Launch description containing sequenced controller starts
     """
+
+    # The controllers read their settings from this file. We hand it to each
+    # spawner directly, because the controllers do not pick it up on their own.
+    controllers_file = os.path.join(
+        str(Path.home()),
+        'ros2_ws/install/yahboom_rosmaster_description/share',
+        'yahboom_rosmaster_description/config/rosmaster_x3/ros2_controllers.yaml')
     # Start mecanum drive controller
-    start_mecanum_drive_controller_cmd = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'mecanum_drive_controller'],
+    start_mecanum_drive_controller_cmd = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['mecanum_drive_controller', '--param-file', controllers_file],
         output='screen'
     )
 
     # Start joint state broadcaster
-    start_joint_state_broadcaster_cmd = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
+    start_joint_state_broadcaster_cmd = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=['joint_state_broadcaster', '--param-file', controllers_file],
         output='screen'
     )
 
