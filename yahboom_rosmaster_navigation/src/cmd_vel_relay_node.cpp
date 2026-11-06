@@ -55,7 +55,7 @@ public:
 
 private:
     /**
-     * @brief Callback function that handles incoming Twist messages
+     * @brief Callback function that handles incoming TwistStamped messages
      *
      * This function is called whenever a new message arrives on the /cmd_vel topic.
      * It copies the velocity data into a new message, adds a fresh timestamp
