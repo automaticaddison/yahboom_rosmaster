@@ -61,9 +61,21 @@ bt_navigator:
     # Built-in plugins are added automatically
     # plugin_lib_names: []
 
-    error_code_names:
-      - compute_path_error_code
-      - follow_path_error_code
+    error_code_name_prefixes:
+      - assisted_teleop
+      - backup
+      - compute_path
+      - dock_robot
+      - drive_on_heading
+      - follow_object
+      - follow_path
+      - nav_thru_poses
+      - nav_to_pose
+      - route
+      - spin
+      - smoother
+      - undock_robot
+      - wait
 
 
 controller_server:
@@ -118,7 +130,9 @@ controller_server:
       transform_tolerance: 0.1
       temperature: 0.3
       gamma: 0.015
-      motion_model: "Omni"
+      motion_model: "omni"
+      omni:
+        plugin: "mppi::OmniMotionModel"
       visualize: false
       regenerate_noises: false
       TrajectoryVisualizer:
